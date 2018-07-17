@@ -25,7 +25,9 @@ class Home extends StatelessWidget {
             elevation: 15.0,
             shadowColor: Colors.white,
             child: InkWell(
-                onTap: (){},
+                onTap: (){
+                  Navigator.pushNamed(context, 'detail/${item.category}');
+                },
                 child: Image(
                   image: AssetImage(item.image),
                   fit: BoxFit.cover,
