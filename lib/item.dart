@@ -15,33 +15,23 @@ class Item {
   String imageName, typeCategory, category, color;
   bool owned;
 
-  Item.create(
+  Item({
     this.itemId,
     this.imageName,
     this.typeCategory,
     this.category,
     this.color,
     this.owned,
-  );
+  });
 
-  Item.update({@required this.itemId, imageName, typeCategory,
-    category, color, owned}) {
-    if (imageName != null) {
-      this.imageName = imageName;
-    }
-    if (typeCategory != null) {
-      this.typeCategory = typeCategory;
-    }
-    if (category != null) {
-      this.category = category;
-    }
-    if (color != null) {
-      this.color = color;
-    }
-    if (color != null) {
-      this.color = color;
-    }
-  }
+  Item.fromMap(Map<String, dynamic> map): this(
+    itemId       : map[columnItemId],
+    imageName    : map[columnImageName],
+    typeCategory : map[columnTypeCategory],
+    category     : map[columnCategory],
+    color        : map[columnColor],
+    owned        : map[columnOwned] == 1,
+  );
 
   Map toMap() {
     return {
@@ -53,14 +43,4 @@ class Item {
       columnOwned:        owned == true ? 1 : 0,
     };
   }
-
-  Item.fromMap(Map<String, dynamic> map)
-    : this.update(
-      itemId       : map[columnItemId],
-      imageName    : map[columnImageName],
-      typeCategory : map[columnTypeCategory],
-      category     : map[columnCategory],
-      color        : map[columnColor],
-      owned        : map[columnOwned] == 1,
-    );
 }

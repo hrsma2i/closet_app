@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:closet_app/home.dart';
+import 'package:closet_app/database.dart';
+import 'package:closet_app/item.dart';
+import 'package:closet_app/home2.dart';
 
 void main() => runApp(new MyApp());
 
@@ -24,7 +26,7 @@ void main() => runApp(new MyApp());
 //    Item item = items.firstWhere((it) => it.category == category);
 //    return MaterialPageRoute(
 //      settings: settings,
-//      builder: (context) => Detail(item),
+//      buder: (context) => Detail(item),
 //    );
 //  }
 //}
@@ -33,7 +35,34 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      home: new HomeScreen()
+      routes: {
+        '/': (BuildContext context) => new HomeScreen(),
+      },
     );
   }
 }
+
+//class HomeScreen extends StatefulWidget {
+//  @override
+//  HomeScreenState createState() => new HomeScreenState();
+//}
+//
+//class HomeScreenState extends State<HomeScreen> {
+//  List<Item> _items = new List();
+//
+//  @override
+//  void initState() {
+//    super.initState();
+//    ClosetDatabase.get().init();
+//  }
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return new Scaffold(
+//      appBar: new AppBar(
+//        title: new Text('closet'),
+//      ),
+//      body: new Container(),
+//    );
+//  }
+//}

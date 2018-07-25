@@ -1,49 +1,50 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:closet_app/item.dart';
 
+import 'package:flutter/services.dart';
 
-class AppDatabase {
-  static final AppDatabase _appDatabase = new AppDatabase._internal();
 
-  //private internal constructor to make it singleton
-  AppDatabase._internal();
+class ClosetDatabase {
+  static final ClosetDatabase _closetDatabase = new ClosetDatabase._internal();
 
-  Database _database;
   Database db;
-
-  static AppDatabase get(){
-    return _appDatabase;
-  }
 
   bool didInit = false;
 
-  Future<Database> _getDb() async {
-    print('_getDb');
-    if (!didInit) await _init();
-    return _database;
+  static ClosetDatabase get(){
+    print('get');
+    return _closetDatabase;
   }
 
-  Future _init() async {
-    print('_init');
+  Future<Database> _getDb() async {
+    if (!didInit) await init();
+    return db;
+  }
+
+  ClosetDatabase._internal();
+
+  Future init() async {
+    print('init');
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "closet.db");
-    //_database = await openDatabase(
-    _database = await openDatabase(
-        path,
-        version: 1,
+    //String path = join(documentsDirectory.path, "closet.db");
+    //-----------sample db---------------------
+    String path = join(documentsDirectory.path, "asset_example.db");
+    await deleteDatabase(path);
+    ByteData data = await rootBundle.load("example.db");
+    List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    await new File(path).writeAsBytes(bytes);
+    //-----------sample db---------------------
+    db = await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
-          await _createItemTable(db);
+          print('onCreate');
+          //await _createItemTable(db);
         },
-        //onUpgrade: (Database db, int oldVersion, int newVersion) async {
-        //  await db.execute("DROP TABLE ${Item.tableItem}");
-        //  await _createItemTable(db);
-        //},
     );
     didInit = true;
   }
@@ -72,33 +73,23 @@ class AppDatabase {
             ${Item.columnTypeCategory},
             ${Item.columnCategory},
             ${Item.columnColor},
-            ${Item.columnOwned},
-          ) VALUES(
+            ${Item.columnOwned} )
+          VALUES(
             0,
             "./images/dress_shoes_black_martens.PNG",
             "shoes",
             "dress shoes",
             "black",
-            1,
-          )
+            1);
           ''',
         );
       }
     );
   }
 
-  Future<List<Item>> getOwnedItems() async {
-    print('getOwnedItems');
-    Database db = await _getDb();
-
-    var sql =
-      '''
-      SELECT * FROM ${Item.tableItem};
-      ''';
-    //WHERE ${Item.columnOwned} == 1;
-    var result = await db.rawQuery(
-      sql
-    );
+  Future<List<Item>> getItems(sql) async {
+    var db = await _getDb();
+    var result = await db.rawQuery(sql);
     print(result);
 
     List<Item> items = new List();
@@ -108,6 +99,7 @@ class AppDatabase {
     }
     return items;
   }
+
 }
 
 
