@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:closet_app/database.dart';
 import 'package:closet_app/item.dart';
-import 'package:closet_app/home2.dart';
+import 'package:closet_app/home.dart';
 
 void main() => runApp(new MyApp());
 

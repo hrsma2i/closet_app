@@ -1,14 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 class Item {
-  static final String tableItem          = "items";
-  static final String columnItemId       = "item_id";
-  static final String columnImageName    = "image_name";
-  static final String columnTypeCategory = "typecategory";
-  static final String columnCategory     = "category";
-  static final String columnColor        = "color";
-  static final String columnOwned        = "owned";
+  static final String tblItem         = "items";
+  static final String colItemId       = "item_id";
+  static final String colImageName    = "image_name";
+  static final String colTypeCategory = "typecategory";
+  static final String colCategory     = "category";
+  static final String colColor        = "color";
+  static final String colOwned        = "owned";
 
   int itemId;
   //List<int> outfitIds;
@@ -25,22 +24,22 @@ class Item {
   });
 
   Item.fromMap(Map<String, dynamic> map): this(
-    itemId       : map[columnItemId],
-    imageName    : map[columnImageName],
-    typeCategory : map[columnTypeCategory],
-    category     : map[columnCategory],
-    color        : map[columnColor],
-    owned        : map[columnOwned] == 1,
+    itemId       : map[colItemId],
+    imageName    : map[colImageName],
+    typeCategory : map[colTypeCategory],
+    category     : map[colCategory],
+    color        : map[colColor],
+    owned        : map[colOwned] == 1,
   );
 
   Map toMap() {
     return {
-      columnItemId:       itemId,
-      columnImageName:    imageName,
-      columnTypeCategory: typeCategory,
-      columnCategory:     category,
-      columnColor:        color,
-      columnOwned:        owned == true ? 1 : 0,
+      colItemId:       itemId,
+      colImageName:    imageName,
+      colTypeCategory: typeCategory,
+      colCategory:     category,
+      colColor:        color,
+      colOwned:        owned == true ? 1 : 0,
     };
   }
 }

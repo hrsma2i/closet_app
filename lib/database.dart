@@ -4,10 +4,11 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
 
 import 'package:closet_app/item.dart';
+import 'package:closet_app/outfit.dart';
 
-import 'package:flutter/services.dart';
 
 
 class ClosetDatabase {
@@ -55,25 +56,25 @@ class ClosetDatabase {
       (Transaction txn) async {
         txn.execute(
           '''
-          CREATE TABLE ${Item.tableItem} ( 
-            ${Item.columnItemId}       INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${Item.columnImageName}    TEXT NOT NULL,
-            ${Item.columnTypeCategory} TEXT NOT NULL,
-            ${Item.columnCategory}     TEXT NOT NULL,
-            ${Item.columnColor}        TEXT NOT NULL,
-            ${Item.columnOwned}        INTEGER NOT NULL
+          CREATE TABLE ${Item.tblItem} ( 
+            ${Item.colItemId}       INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${Item.colImageName}    TEXT NOT NULL,
+            ${Item.colTypeCategory} TEXT NOT NULL,
+            ${Item.colCategory}     TEXT NOT NULL,
+            ${Item.colColor}        TEXT NOT NULL,
+            ${Item.colOwned}        INTEGER NOT NULL
           );
           '''
         );
         txn.rawInsert(
           '''
-          INSERT INTO ${Item.tableItem}(
-            ${Item.columnItemId},
-            ${Item.columnImageName},
-            ${Item.columnTypeCategory},
-            ${Item.columnCategory},
-            ${Item.columnColor},
-            ${Item.columnOwned} )
+          INSERT INTO ${Item.tblItem}(
+            ${Item.colItemId},
+            ${Item.colImageName},
+            ${Item.colTypeCategory},
+            ${Item.colCategory},
+            ${Item.colColor},
+            ${Item.colOwned} )
           VALUES(
             0,
             "./images/dress_shoes_black_martens.PNG",
@@ -100,32 +101,18 @@ class ClosetDatabase {
     return items;
   }
 
+  Future<List<Outfit>> getOutfits(sql) async {
+    var db = await _getDb();
+    var result = await db.rawQuery(sql);
+    print(result.length);
+    print(result);
+
+    List<Outfit> outfits = new List();
+    for (Map<String, dynamic> outfit in result) {
+      var myOutfit = new Outfit.fromMap(outfit);
+      outfits.add(myOutfit);
+    }
+    return outfits;
+  }
+
 }
-
-
-//List<Map> itemMaps = [
-//  {
-//    columnItemId:       0,
-//    columnImageName:    './images/shirtshalf_aloha.PNG',
-//    columnTypeCategory: 'tops',
-//    columnCategory:     'half sleeve shirts',
-//    columnColor:        "grey",
-//    columnOwned:        1,
-//  },
-//  {
-//    columnItemId:       1,
-//    columnImageName:    './images/denim_indigo.PNG',
-//    columnTypeCategory: 'pants',
-//    columnCategory:     'denim pants',
-//    columnColor:        "blue",
-//    columnOwned:        1,
-//  },
-//  {
-//    columnItemId:       2,
-//    columnImageName:    './images/dress_shoes_black_martens.PNG',
-//    columnTypeCategory: 'shoes',
-//    columnCategory:     'dress shoes',
-//    columnColor:        "black",
-//    columnOwned:        1,
-//  },
-//];
