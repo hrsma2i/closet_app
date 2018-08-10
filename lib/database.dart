@@ -91,7 +91,6 @@ class ClosetDatabase {
   Future<List<Item>> getItems(sql) async {
     var db = await _getDb();
     var result = await db.rawQuery(sql);
-    print(result);
 
     List<Item> items = new List();
     for (Map<String, dynamic> item in result) {
@@ -101,11 +100,37 @@ class ClosetDatabase {
     return items;
   }
 
+  Future updateItem(Item item) async {
+    await db.transaction((txn) async {
+      await txn.rawInsert(
+        """
+        INSERT OR REPLACE INTO ${Item.tblItem}(
+          ${Item.colItemId},
+          ${Item.colImageName},
+          ${Item.colInsulation},
+          ${Item.colRemovable},
+          ${Item.colTypeCategory},
+          ${Item.colCategory},
+          ${Item.colColor},
+          ${Item.colOwned}
+        ) VALUES (
+          ${item.itemId},
+          "${item.imageName}",
+          ${item.insulation},
+          ${item.removable?1:0},
+          "${item.typeCategory}",
+          "${item.category}",
+          "${item.color}",
+          ${item.owned?1:0}
+        );
+        """
+      );
+    });
+  }
+
   Future<List<Outfit>> getOutfits(sql) async {
     var db = await _getDb();
     var result = await db.rawQuery(sql);
-    print(result.length);
-    print(result);
 
     List<Outfit> outfits = new List();
     for (Map<String, dynamic> outfit in result) {

@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 
+
 class Outfit {
   static final String tblLink       = "links";
   static final String colOutfitId   = "outfit_id";
@@ -7,6 +8,10 @@ class Outfit {
   static final String colItemIds    = "item_ids";
   static final String colImageNames = "image_names";
   static final String colPossible   = "possible";
+  static final String colMaxIns     = "max_insulation";
+  static final String colMinIns     = "min_insulation";
+  static final String colTempMin    = "temp_min";
+  static final String colTempMax    = "temp_max";
 
   int outfitId;
   List<int> itemIds;
@@ -17,6 +22,7 @@ class Outfit {
     this.itemIds,
     this.imageNames,
   });
+
 
   Outfit.fromMap(Map<String, dynamic> map): this(
     outfitId: map[colOutfitId],

@@ -38,6 +38,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (BuildContext context) => new HomeScreen(),
       },
+      theme: new ThemeData(
+        primarySwatch: Colors.blueGrey,
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
@@ -6,7 +7,10 @@ import 'package:quiver/iterables.dart';
 
 import 'package:closet_app/database.dart';
 import 'package:closet_app/item.dart';
-import 'package:closet_app/outfit.dart';
+import 'package:closet_app/item_page.dart';
+import 'package:closet_app/utils.dart';
+import 'package:closet_app/sql.dart';
+
 
 class HomeScreen extends StatelessWidget {
   static List<ItemTopTab> itemTopTabs = [
@@ -16,6 +20,7 @@ class HomeScreen extends StatelessWidget {
   ];
 
   static List<OutfitTopTab> outfitTopTabs = [
+    OutfitTopTab('today'),
     OutfitTopTab('possible'),
     OutfitTopTab('all'),
   ];
@@ -23,7 +28,9 @@ class HomeScreen extends StatelessWidget {
   static List<Widget> bottomPages = [
     BottomPageWithTopTabs('Outfit', outfitTopTabs),
     BottomPageWithTopTabs('Items',  itemTopTabs),
-    BottomPageWithTopTabs('Find',   itemTopTabs),
+    BottomPageWithTopTabs('Find',   [
+      FindOutfitTopTab('outfit'),
+    ]),
   ];
 
   static List<String> names = [
@@ -83,11 +90,6 @@ class BottomPageContainerState extends State<BottomPageContainer> {
           )
         )
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: (){},
-        tooltip: 'Pick Image',
-        child: new Icon(Icons.add_a_photo),
-      ),
       bottomNavigationBar: new BottomNavigationBar(
         currentIndex: index,
         onTap: (int index) { setState((){ this.index = index; }); },
@@ -122,6 +124,7 @@ class BottomPageWithTopTabs extends StatelessWidget {
             ).toList(),
           ),
         ),
+        floatingActionButton: new FancyFab(heroTag: this.name),
         body: TabBarView(
           children: topTabs,
         ),
@@ -148,35 +151,30 @@ class ItemTopTab extends TopTab {
 
 class ItemTopTabState extends State<ItemTopTab> {
   String name;
-  List<Widget> gridCells;
+  final List<Item> _items = new List();
 
   ItemTopTabState(this.name);
 
   @override
   void initState(){
+    updateItems();
     super.initState();
+  }
+
+  void updateItems() {
     ClosetDatabase.get()
-      .getItems(sqlMapItem[name])
-      .then((items) {
+        .getItems(sqlMapItem[name])
+        .then((items) {
           setState(() {
-            //gridCells = items.map(
-            //    (item) => Image(
-            //    image: AssetImage(
-            //        join('images', item.imageName)
-            //    )
-            //  ),
-            //).toList();
-            gridCells = items.map(
-                  (item) => ItemCard(item)
-            ).toList();
+            _items.clear();
+            _items.addAll(items);
           });
-        }
-      );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    return gridCells != null
+    return _items != null
       ? new Padding(
         padding: EdgeInsets.all(2.5),
         child: GridView.count(
@@ -184,7 +182,9 @@ class ItemTopTabState extends State<ItemTopTab> {
           //padding: const EdgeInsets.all(2.5),
           crossAxisSpacing: 2.5,
           crossAxisCount: 3,
-          children: gridCells,
+          children: _items.map((item) =>
+            ItemCard(item)
+          ).toList(),
         )
       )
       : new Container();
@@ -198,13 +198,27 @@ class ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Card(
-      child: Padding(
-        padding: EdgeInsets.all(3.0),
-        child: Image.asset(
-          join('images', item.imageName)
-        ),
-      )
+    return GestureDetector(
+      onTap: (){
+        Navigator.of(context).push(
+          new FadeRoute(
+            builder: (BuildContext context) =>
+                new ItemPage(item),
+            settings: new RouteSettings(
+              name: '/item_detail',
+              isInitialRoute: false
+            ),
+          )
+        );
+      },
+      child: new Card(
+        child: Padding(
+          padding: EdgeInsets.all(3.0),
+          child: Image.asset(
+            join('images', item.imageName)
+          ),
+        )
+      ),
     );
   }
 }
@@ -233,7 +247,7 @@ class OutfitTopTabState extends State<OutfitTopTab> {
         .then((outfits) {
       setState(() {
         gridCells = outfits.map(
-          (outfit) => OutfitCard(outfit)
+          (outfit) => OutfitCard(outfit.imageNames)
         ).toList();
       });
     }
@@ -254,21 +268,103 @@ class OutfitTopTabState extends State<OutfitTopTab> {
   }
 }
 
-class OutfitCard extends StatelessWidget {
-  Outfit outfit;
+class FindOutfitTopTab extends TopTab {
+  String name;
 
-  OutfitCard(this.outfit);
+  FindOutfitTopTab(this.name);
+
+  @override
+  FindOutfitTopTabState createState() => new FindOutfitTopTabState(name);
+}
+
+
+class FindOutfitTopTabState extends State<FindOutfitTopTab> {
+  String name;
+  List<Widget> gridCells;
+
+  FindOutfitTopTabState(this.name);
+
+  static List<List<String>> howCmbs = [
+    ['tops', 'bottoms', 'shoes'],
+    ['tops', 'under', 'bottoms', 'shoes'],
+    ['outer', 'tops', 'bottoms', 'shoes'],
+    ['outer', 'tops', 'under', 'bottoms', 'shoes'],
+  ];
+
+  List<String> howCmb = howCmbs[0];
+
+  getCandidates() async {
+    Map<String, List<Item>> candidates = {};
+
+    await Future.forEach(howCmb, (how) async {
+      String sql = """
+        SELECT *
+        FROM ${Item.tblItem}
+          INNER JOIN ${Item.tblCategoryHow}
+            ON ${Item.tblItem}.${Item.colTypeCategory}
+             = ${Item.tblCategoryHow}.${Item.colTypeCategory}
+        WHERE ${Item.tblCategoryHow}.${Item.colHow} == '$how';
+      """;
+      //ClosetDatabase
+      //  .get().getItems(sql)
+      //  .then((items) {
+      //    print(items);
+      //    candidates[how] = items;
+      //  });
+      candidates[how] = await ClosetDatabase
+        .get().getItems(sql);
+    });
+
+    return candidates;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    int nSample = 20;
+    getCandidates().then((candidates) {
+      setState(() {
+        Random random = Random();
+        gridCells = List.generate(nSample, (int i) =>
+          OutfitCard(
+            howCmb.map<String>((how) {
+              return candidates[how]
+              [random.nextInt(candidates[how].length)].imageName;
+            }).toList()
+          )
+        );
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    return gridCells != null
+      ? GridView.count(
+        primary: false,
+        padding: const EdgeInsets.all(5.0),
+        crossAxisSpacing: 5.0,
+        crossAxisCount: 2,
+        children: gridCells,
+      )
+      : new Container();
+  }
+}
+
+class OutfitCard extends StatelessWidget {
+  List<String> imageNames;
+
+  OutfitCard(this.imageNames);
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       child: new GridView.count(
         primary: false,
         padding: const EdgeInsets.all(0.0),
         crossAxisSpacing: 0.0,
-        crossAxisCount: sqrt(outfit.itemIds.length).ceil(),
-        children: outfit.imageNames.map(
+        crossAxisCount: sqrt(imageNames.length).ceil(),
+        children: imageNames.map(
                 (imageName) => new Padding(
                   padding: EdgeInsets.all(3.0),
                   child: Image(
@@ -283,57 +379,146 @@ class OutfitCard extends StatelessWidget {
   }
 }
 
+class FancyFab extends StatefulWidget {
+  final Function() onPressed;
+  final String tooltip;
+  final IconData icon;
+  final Object heroTag;
 
-Map<String, String> sqlMapItem = {
-  'owned':
-    '''
-    SELECT * FROM ${Item.tblItem}
-    WHERE ${Item.colOwned} == 1;
-    ''',
-  'to buy':
-    '''
-    SELECT * FROM ${Item.tblItem}
-    WHERE ${Item.colOwned} == 0;
-    ''',
-  'all':
-    '''
-    SELECT * FROM ${Item.tblItem};
-    ''',
-};
+  FancyFab({this.heroTag, this.onPressed, this.tooltip, this.icon});
 
-Map<String, String> sqlMapOutfit = {
-  'all':
-    '''
-    SELECT ${Outfit.tblLink}.${Outfit.colOutfitId},
-           GROUP_CONCAT(${Item.tblItem}.${Item.colItemId}   , ',')
-             AS ${Outfit.colItemIds},
-           GROUP_CONCAT(${Item.tblItem}.${Item.colImageName}, ',')
-             AS ${Outfit.colImageNames}
-    FROM ${Outfit.tblLink}
-      INNER JOIN ${Item.tblItem}
-        ON ${Outfit.tblLink}.${Item.colItemId}
-         = ${Item.tblItem}.${Item.colItemId}
-    GROUP BY ${Outfit.tblLink}.${Outfit.colOutfitId};
-    ''',
-  'possible':
-    '''
-    SELECT ${Outfit.colOutfitId},
-           ${Outfit.colItemIds},
-           ${Outfit.colImageNames}
-    FROM(
-      SELECT ${Outfit.tblLink}.${Outfit.colOutfitId},
-             GROUP_CONCAT(${Item.tblItem}.${Item.colItemId}, ',')
-               AS ${Outfit.colItemIds},
-             GROUP_CONCAT(${Item.tblItem}.${Item.colImageName}, ',')
-               AS ${Outfit.colImageNames},
-             MIN(${Item.tblItem}.${Item.colOwned})
-               AS ${Outfit.colPossible}
-      FROM ${Outfit.tblLink}
-        INNER JOIN ${Item.tblItem}
-          ON ${Outfit.tblLink}.${Item.colItemId}
-           = ${Item.tblItem}.${Item.colItemId}
-      GROUP BY ${Outfit.tblLink}.${Outfit.colOutfitId}
-    )
-    WHERE ${Outfit.colPossible} == 1;
-    ''',
-};
+  @override
+  _FancyFabState createState() => _FancyFabState();
+}
+
+class _FancyFabState extends State<FancyFab>
+    with SingleTickerProviderStateMixin {
+  bool isOpened = false;
+  AnimationController _animationController;
+  Animation<Color> _animateColor;
+  Animation<double> _animateIcon;
+  Animation<double> _translateButton;
+  Curve _curve = Curves.easeOut;
+  double _fabHeight = 56.0;
+
+  @override
+  void initState() {
+    _animationController = 
+      AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 200),
+      )..addListener((){
+        setState((){});
+      });
+
+    _animateIcon =
+      Tween<double>(
+        begin: 0.0,
+        end: 1.0
+      ).animate(_animationController);
+
+    _animateColor = ColorTween(
+      begin: Colors.blueGrey,
+      end: Colors.red,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(
+          0.00,
+          1.00,
+          curve: _curve,
+        ),
+      )
+    );
+
+    _translateButton = Tween<double>(
+      begin: _fabHeight,
+      end: -14.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Interval(
+        0.0,
+        0.75,
+        curve: _curve,
+      )
+    ));
+    super.initState();
+  }
+
+  @override
+  dispose(){
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  animate() {
+    if (!isOpened) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
+    isOpened = !isOpened;
+  }
+
+  Widget sort(){
+    return new Container(
+      child: FloatingActionButton(
+        heroTag: "${widget.heroTag}_sort",
+        onPressed: null,
+        tooltip: 'Sort',
+        child: Icon(Icons.sort),
+      ),
+    );
+  }
+
+  Widget filter(){
+    return new Container(
+      child: FloatingActionButton(
+        heroTag: "${widget.heroTag}_fliter",
+        onPressed: null,
+        tooltip: 'Filter',
+        child: Icon(Icons.filter_list),
+      ),
+    );
+  }
+
+  Widget toggle() {
+    return FloatingActionButton(
+      heroTag: "${widget.heroTag}_toggle",
+      backgroundColor: _animateColor.value,
+      onPressed: animate,
+      tooltip: 'Toggle',
+      child: AnimatedIcon(
+        icon: AnimatedIcons.menu_close,
+        progress: _animateIcon,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        Transform(
+          transform: Matrix4.translationValues(
+            0.0,
+            _translateButton.value * 2.0,
+            0.0,
+          ),
+          child: sort(),
+        ),
+        Transform(
+          transform: Matrix4.translationValues(
+            0.0,
+            _translateButton.value * 1.0,
+            0.0,
+          ),
+          child: filter(),
+        ),
+        toggle(),
+      ],
+    );
+  }
+}
+
