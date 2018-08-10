@@ -7,9 +7,11 @@ import 'package:quiver/iterables.dart';
 
 import 'package:closet_app/database.dart';
 import 'package:closet_app/item.dart';
-import 'package:closet_app/item_page.dart';
+import 'package:closet_app/outfit.dart';
+import 'package:closet_app/item_details_page.dart';
 import 'package:closet_app/utils.dart';
 import 'package:closet_app/sql.dart';
+import 'package:closet_app/typedef.dart';
 
 
 class HomeScreen extends StatelessWidget {
@@ -124,7 +126,6 @@ class BottomPageWithTopTabs extends StatelessWidget {
             ).toList(),
           ),
         ),
-        floatingActionButton: new FancyFab(heroTag: this.name),
         body: TabBarView(
           children: topTabs,
         ),
@@ -174,27 +175,34 @@ class ItemTopTabState extends State<ItemTopTab> {
 
   @override
   Widget build(BuildContext context) {
-    return _items != null
-      ? new Padding(
-        padding: EdgeInsets.all(2.5),
-        child: GridView.count(
-          primary: false,
-          //padding: const EdgeInsets.all(2.5),
-          crossAxisSpacing: 2.5,
-          crossAxisCount: 3,
-          children: _items.map((item) =>
-            ItemCard(item)
-          ).toList(),
+    return Scaffold(
+      floatingActionButton: new FancyFab(
+          heroTag: "item_${this.name}"
+      ),
+      body:_items != null
+        ? new Padding(
+          padding: EdgeInsets.all(2.5),
+          child: GridView.builder(
+            padding: const EdgeInsets.all(2.5),
+            itemBuilder: (BuildContext context, int index) =>
+              new ItemCard(_items[index], updateItems),
+            gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 2.5,
+            ),
+            itemCount: _items.length,
+          )
         )
-      )
-      : new Container();
+        : new Container()
+    );
   }
 }
 
 class ItemCard extends StatelessWidget {
   Item item;
+  ItemUpdater updateItem;
 
-  ItemCard(this.item);
+  ItemCard(this.item, this.updateItem);
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +211,7 @@ class ItemCard extends StatelessWidget {
         Navigator.of(context).push(
           new FadeRoute(
             builder: (BuildContext context) =>
-                new ItemPage(item),
+                new ItemPage(item, updateItem),
             settings: new RouteSettings(
               name: '/item_detail',
               isInitialRoute: false
@@ -235,7 +243,7 @@ class OutfitTopTab extends TopTab {
 
 class OutfitTopTabState extends State<OutfitTopTab> {
   String name;
-  List<Widget> gridCells;
+  final List<Outfit> _outfits = new List();
 
   OutfitTopTabState(this.name);
 
@@ -246,9 +254,8 @@ class OutfitTopTabState extends State<OutfitTopTab> {
         .getOutfits(sqlMapOutfit[name])
         .then((outfits) {
       setState(() {
-        gridCells = outfits.map(
-          (outfit) => OutfitCard(outfit.imageNames)
-        ).toList();
+        _outfits.clear();
+        _outfits.addAll(outfits);
       });
     }
     );
@@ -256,15 +263,46 @@ class OutfitTopTabState extends State<OutfitTopTab> {
 
   @override
   Widget build(BuildContext context) {
-    return gridCells != null
-      ? GridView.count(
-        primary: false,
+    return _outfits != null
+      ? GridView.builder(
         padding: const EdgeInsets.all(5.0),
-        crossAxisSpacing: 5.0,
-        crossAxisCount: 2,
-        children: gridCells,
+        gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisSpacing: 5.0,
+          crossAxisCount: 2,
+        ),
+        itemBuilder: (BuildContext context, index) =>
+          OutfitCard(_outfits[index].imageNames),
+        itemCount: _outfits.length,
       )
       : new Container();
+  }
+}
+
+class OutfitCard extends StatelessWidget {
+  List<String> imageNames;
+
+  OutfitCard(this.imageNames);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: new GridView.count(
+        primary: false,
+        padding: const EdgeInsets.all(0.0),
+        crossAxisSpacing: 0.0,
+        crossAxisCount: sqrt(imageNames.length).ceil(),
+        children: imageNames.map(
+                (imageName) => new Padding(
+              padding: EdgeInsets.all(3.0),
+              child: Image(
+                  image: AssetImage(
+                      join('images', imageName)
+                  )
+              ),
+            )
+        ).toList(),
+      ),
+    );
   }
 }
 
@@ -351,33 +389,6 @@ class FindOutfitTopTabState extends State<FindOutfitTopTab> {
   }
 }
 
-class OutfitCard extends StatelessWidget {
-  List<String> imageNames;
-
-  OutfitCard(this.imageNames);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: new GridView.count(
-        primary: false,
-        padding: const EdgeInsets.all(0.0),
-        crossAxisSpacing: 0.0,
-        crossAxisCount: sqrt(imageNames.length).ceil(),
-        children: imageNames.map(
-                (imageName) => new Padding(
-                  padding: EdgeInsets.all(3.0),
-                  child: Image(
-                  image: AssetImage(
-                      join('images', imageName)
-                  )
-            ),
-                )
-        ).toList(),
-      ),
-    );
-  }
-}
 
 class FancyFab extends StatefulWidget {
   final Function() onPressed;
