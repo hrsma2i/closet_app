@@ -12,6 +12,7 @@ import 'package:closet_app/item_details_page.dart';
 import 'package:closet_app/utils.dart';
 import 'package:closet_app/sql.dart';
 import 'package:closet_app/typedef.dart';
+import 'package:closet_app/filter_page.dart';
 
 
 class HomeScreen extends StatelessWidget {
@@ -122,7 +123,7 @@ class BottomPageWithTopTabs extends StatelessWidget {
           title: Text(name),
           bottom: TabBar(
             tabs: topTabs.map(
-                    (topTab) => new Tab(text: topTab.name)
+                    (topTab) => new Tab(text: topTab.title)
             ).toList(),
           ),
         ),
@@ -135,36 +136,38 @@ class BottomPageWithTopTabs extends StatelessWidget {
 }
 
 abstract class TopTab extends StatefulWidget {
-  String name;
+  String title;
 
   State createState();
 }
 
 class ItemTopTab extends TopTab {
-  String name;
+  String title;
 
-  ItemTopTab(this.name);
+  ItemTopTab(this.title);
 
   @override
-  ItemTopTabState createState() => new ItemTopTabState(name);
+  ItemTopTabState createState() => new ItemTopTabState(title);
 }
 
 
 class ItemTopTabState extends State<ItemTopTab> {
-  String name;
+  final String title;
   final List<Item> _items = new List();
+  String queryName;
 
-  ItemTopTabState(this.name);
+  ItemTopTabState(this.title);
 
   @override
   void initState(){
+    queryName = title;
     updateItems();
     super.initState();
   }
 
   void updateItems() {
     ClosetDatabase.get()
-        .getItems(sqlMapItem[name])
+        .getItems(sqlMapItem[queryName])
         .then((items) {
           setState(() {
             _items.clear();
@@ -173,11 +176,21 @@ class ItemTopTabState extends State<ItemTopTab> {
         });
   }
 
+  void updateQueryName(queryName) {
+    print('updated parent queryName');
+    setState(() {
+      this.queryName = queryName;
+      print(this.queryName);
+    });
+    updateItems();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: new FancyFab(
-          heroTag: "item_${this.name}"
+        heroTag: "item_${this.title}",
+        updateQueryName: updateQueryName,
       ),
       body:_items != null
         ? new Padding(
@@ -232,12 +245,12 @@ class ItemCard extends StatelessWidget {
 }
 
 class OutfitTopTab extends TopTab {
-  String name;
+  String title;
 
-  OutfitTopTab(this.name);
+  OutfitTopTab(this.title);
 
   @override
-  OutfitTopTabState createState() => new OutfitTopTabState(name);
+  OutfitTopTabState createState() => new OutfitTopTabState(title);
 }
 
 
@@ -306,97 +319,21 @@ class OutfitCard extends StatelessWidget {
   }
 }
 
-class FindOutfitTopTab extends TopTab {
-  String name;
-
-  FindOutfitTopTab(this.name);
-
-  @override
-  FindOutfitTopTabState createState() => new FindOutfitTopTabState(name);
-}
-
-
-class FindOutfitTopTabState extends State<FindOutfitTopTab> {
-  String name;
-  List<Widget> gridCells;
-
-  FindOutfitTopTabState(this.name);
-
-  static List<List<String>> howCmbs = [
-    ['tops', 'bottoms', 'shoes'],
-    ['tops', 'under', 'bottoms', 'shoes'],
-    ['outer', 'tops', 'bottoms', 'shoes'],
-    ['outer', 'tops', 'under', 'bottoms', 'shoes'],
-  ];
-
-  List<String> howCmb = howCmbs[0];
-
-  getCandidates() async {
-    Map<String, List<Item>> candidates = {};
-
-    await Future.forEach(howCmb, (how) async {
-      String sql = """
-        SELECT *
-        FROM ${Item.tblItem}
-          INNER JOIN ${Item.tblCategoryHow}
-            ON ${Item.tblItem}.${Item.colTypeCategory}
-             = ${Item.tblCategoryHow}.${Item.colTypeCategory}
-        WHERE ${Item.tblCategoryHow}.${Item.colHow} == '$how';
-      """;
-      //ClosetDatabase
-      //  .get().getItems(sql)
-      //  .then((items) {
-      //    print(items);
-      //    candidates[how] = items;
-      //  });
-      candidates[how] = await ClosetDatabase
-        .get().getItems(sql);
-    });
-
-    return candidates;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    int nSample = 20;
-    getCandidates().then((candidates) {
-      setState(() {
-        Random random = Random();
-        gridCells = List.generate(nSample, (int i) =>
-          OutfitCard(
-            howCmb.map<String>((how) {
-              return candidates[how]
-              [random.nextInt(candidates[how].length)].imageName;
-            }).toList()
-          )
-        );
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return gridCells != null
-      ? GridView.count(
-        primary: false,
-        padding: const EdgeInsets.all(5.0),
-        crossAxisSpacing: 5.0,
-        crossAxisCount: 2,
-        children: gridCells,
-      )
-      : new Container();
-  }
-}
-
-
 class FancyFab extends StatefulWidget {
+  final Object heroTag;
   final Function() onPressed;
   final String tooltip;
   final IconData icon;
-  final Object heroTag;
 
-  FancyFab({this.heroTag, this.onPressed, this.tooltip, this.icon});
+  final QueryNameUpdater updateQueryName;
+
+  FancyFab({
+    this.heroTag,
+    this.onPressed,
+    this.tooltip,
+    this.icon,
+    this.updateQueryName,
+  });
 
   @override
   _FancyFabState createState() => _FancyFabState();
@@ -482,11 +419,24 @@ class _FancyFabState extends State<FancyFab>
     );
   }
 
-  Widget filter(){
+  Widget filter(BuildContext context){
     return new Container(
       child: FloatingActionButton(
-        heroTag: "${widget.heroTag}_fliter",
-        onPressed: null,
+        heroTag: "${widget.heroTag}_filter",
+        onPressed: (){
+          Navigator.of(context).push(
+            new MaterialPageRoute(
+              builder: (context) =>
+              new FilterPage(widget.updateQueryName),
+              settings: new RouteSettings(
+                  name: '/edit_filter',
+                  isInitialRoute: false
+              ),
+            )
+          ).then((sql){
+
+          });
+        },
         tooltip: 'Filter',
         child: Icon(Icons.filter_list),
       ),
@@ -525,7 +475,7 @@ class _FancyFabState extends State<FancyFab>
             _translateButton.value * 1.0,
             0.0,
           ),
-          child: filter(),
+          child: filter(context),
         ),
         toggle(),
       ],
@@ -533,3 +483,85 @@ class _FancyFabState extends State<FancyFab>
   }
 }
 
+class FindOutfitTopTab extends TopTab {
+  String title;
+
+  FindOutfitTopTab(this.title);
+
+  @override
+  FindOutfitTopTabState createState() => new FindOutfitTopTabState(title);
+}
+
+
+class FindOutfitTopTabState extends State<FindOutfitTopTab> {
+  String name;
+  List<Widget> gridCells;
+
+  FindOutfitTopTabState(this.name);
+
+  static List<List<String>> howCmbs = [
+    ['tops', 'bottoms', 'shoes'],
+    ['tops', 'under', 'bottoms', 'shoes'],
+    ['outer', 'tops', 'bottoms', 'shoes'],
+    ['outer', 'tops', 'under', 'bottoms', 'shoes'],
+  ];
+
+  List<String> howCmb = howCmbs[0];
+
+  getCandidates() async {
+    Map<String, List<Item>> candidates = {};
+
+    await Future.forEach(howCmb, (how) async {
+      String sql = """
+        SELECT *
+        FROM ${Item.tblItem}
+          INNER JOIN ${Item.tblCategoryHow}
+            ON ${Item.tblItem}.${Item.colTypeCategory}
+             = ${Item.tblCategoryHow}.${Item.colTypeCategory}
+        WHERE ${Item.tblCategoryHow}.${Item.colHow} == '$how';
+      """;
+      //ClosetDatabase
+      //  .get().getItems(sql)
+      //  .then((items) {
+      //    print(items);
+      //    candidates[how] = items;
+      //  });
+      candidates[how] = await ClosetDatabase
+        .get().getItems(sql);
+    });
+
+    return candidates;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    int nSample = 20;
+    getCandidates().then((candidates) {
+      setState(() {
+        Random random = Random();
+        gridCells = List.generate(nSample, (int i) =>
+          OutfitCard(
+            howCmb.map<String>((how) {
+              return candidates[how]
+              [random.nextInt(candidates[how].length)].imageName;
+            }).toList()
+          )
+        );
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return gridCells != null
+      ? GridView.count(
+        primary: false,
+        padding: const EdgeInsets.all(5.0),
+        crossAxisSpacing: 5.0,
+        crossAxisCount: 2,
+        children: gridCells,
+      )
+      : new Container();
+  }
+}

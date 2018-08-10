@@ -1,3 +1,3 @@
-import 'package:closet_app/item.dart';
-
 typedef ItemUpdater();
+
+typedef QueryNameUpdater(String queryName);
