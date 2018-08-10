@@ -4,18 +4,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import 'package:closet_app/item.dart';
+import 'package:closet_app/typedef.dart';
 import 'package:closet_app/database.dart';
 
-class ItemPage extends StatefulWidget {
-  final Item item;
 
-  ItemPage(this.item);
+class ItemDetailsPage extends StatefulWidget {
+  final Item item;
+  final ItemUpdater updateItem;
+
+  ItemDetailsPage(this.item, this.updateItem);
 
   @override
-  State<StatefulWidget> createState() => new ItemPageState();
+  State<StatefulWidget> createState() => new ItemDetailsPageState();
 }
 
-class ItemPageState extends State<ItemPage> {
+class ItemDetailsPageState extends State<ItemDetailsPage> {
 
   GlobalKey<ScaffoldState> key = new GlobalKey();
 
@@ -127,6 +130,7 @@ class ItemPageState extends State<ItemPage> {
                         widget.item.owned = !widget.item.owned;
                       });
                       ClosetDatabase.get().updateItem(widget.item);
+                      widget.updateItem();
                     },
                   ),
                 ],

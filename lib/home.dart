@@ -211,7 +211,7 @@ class ItemCard extends StatelessWidget {
         Navigator.of(context).push(
           new FadeRoute(
             builder: (BuildContext context) =>
-                new ItemPage(item, updateItem),
+                new ItemDetailsPage(item, updateItem),
             settings: new RouteSettings(
               name: '/item_detail',
               isInitialRoute: false
