@@ -1,3 +1,3 @@
 typedef ItemUpdater();
 
-typedef QueryNameUpdater(String queryName);
+typedef ItemsUpdaterByQuery(String sql);

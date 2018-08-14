@@ -176,13 +176,15 @@ class ItemTopTabState extends State<ItemTopTab> {
         });
   }
 
-  void updateQueryName(queryName) {
-    print('updated parent queryName');
-    setState(() {
-      this.queryName = queryName;
-      print(this.queryName);
+  void updateItemsByQuery(sql) {
+    ClosetDatabase.get()
+        .getItems(sql)
+        .then((items) {
+      setState(() {
+        _items.clear();
+        _items.addAll(items);
+      });
     });
-    updateItems();
   }
 
   @override
@@ -190,7 +192,7 @@ class ItemTopTabState extends State<ItemTopTab> {
     return Scaffold(
       floatingActionButton: new FancyFab(
         heroTag: "item_${this.title}",
-        updateQueryName: updateQueryName,
+        updateItemsByQuery: updateItemsByQuery,
       ),
       body:_items != null
         ? new Padding(
@@ -325,14 +327,15 @@ class FancyFab extends StatefulWidget {
   final String tooltip;
   final IconData icon;
 
-  final QueryNameUpdater updateQueryName;
+  final ItemsUpdaterByQuery updateItemsByQuery;
 
   FancyFab({
     this.heroTag,
     this.onPressed,
     this.tooltip,
     this.icon,
-    this.updateQueryName,
+
+    this.updateItemsByQuery,
   });
 
   @override
@@ -427,14 +430,14 @@ class _FancyFabState extends State<FancyFab>
           Navigator.of(context).push(
             new MaterialPageRoute(
               builder: (context) =>
-              new FilterPage(widget.updateQueryName),
+              new FilterPage(),
               settings: new RouteSettings(
                   name: '/edit_filter',
                   isInitialRoute: false
               ),
             )
           ).then((sql){
-
+            widget.updateItemsByQuery(sql);
           });
         },
         tooltip: 'Filter',

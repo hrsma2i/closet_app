@@ -2,10 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d40b884a-6a1d-4760-9be5-73ba3635972b" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/lib/filter_page_old.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/select_color_page.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/select_typecategory_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/filter_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/filter_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/home.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/home.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/typedef.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/typedef.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,8 +28,8 @@
       <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="298">
-              <caret line="39" selection-start-line="39" selection-end-line="39" />
+            <state relative-caret-position="313">
+              <caret line="40" column="6" selection-start-line="40" selection-start-column="6" selection-end-line="40" selection-end-column="6" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -31,17 +39,9 @@
       </file>
       <file leaf-file-name="typedef.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/typedef.dart">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file leaf-file-name="item_details_page.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/item_details_page.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="248">
-              <caret line="22" column="16" selection-start-line="22" selection-start-column="16" selection-end-line="22" selection-end-column="16" />
-              <folding>
-                <element signature="e#0#32#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="30">
+              <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -55,11 +55,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="home.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="home.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/home.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1172">
-              <caret line="436" selection-start-line="436" selection-end-line="436" />
+            <state relative-caret-position="5833">
+              <caret line="432" column="18" selection-start-line="432" selection-start-column="18" selection-end-line="432" selection-end-column="18" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -67,11 +67,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="filter_page.dart" pinned="false" current-in-tab="false">
+      <file leaf-file-name="filter_page.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/filter_page.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="412">
-              <caret line="47" column="17" selection-start-line="47" selection-start-column="17" selection-end-line="47" selection-end-column="17" />
+            <state relative-caret-position="-80">
+              <caret line="71" column="26" selection-start-line="71" selection-start-column="26" selection-end-line="71" selection-end-column="26" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
               </folding>
@@ -79,35 +79,41 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="select_typecategory_page.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/select_typecategory_page.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="109">
+              <caret line="41" column="28" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="select_color_page.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/select_color_page.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="120">
+              <caret line="8" column="39" selection-start-line="8" selection-start-column="39" selection-end-line="8" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pubspec.yaml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pubspec.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="165">
+              <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="sql.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/sql.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
+            <state relative-caret-position="30">
               <caret line="3" column="32" selection-start-line="3" selection-start-column="32" selection-end-line="3" selection-end-column="32" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="database.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/database.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="436">
-              <caret line="121" column="24" selection-start-line="121" selection-start-column="24" selection-end-line="121" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="item.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/item.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" selection-start-line="3" selection-end-line="3" />
             </state>
           </provider>
         </entry>
@@ -133,19 +139,23 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/lib/home2.dart" />
-        <option value="$PROJECT_DIR$/pubspec.yaml" />
         <option value="$PROJECT_DIR$/lib/outfit.dart" />
         <option value="$PROJECT_DIR$/lib/item.dart" />
         <option value="$PROJECT_DIR$/lib/utils.dart" />
         <option value="$PROJECT_DIR$/lib/database.dart" />
-        <option value="$PROJECT_DIR$/lib/main.dart" />
         <option value="$PROJECT_DIR$/lib/item_page.dart" />
         <option value="$PROJECT_DIR$/lib/sql.dart" />
         <option value="$PROJECT_DIR$/lib/condition.dart" />
         <option value="$PROJECT_DIR$/lib/item_details_page.dart" />
         <option value="$PROJECT_DIR$/lib/typedef.dart" />
-        <option value="$PROJECT_DIR$/lib/filter_page.dart" />
         <option value="$PROJECT_DIR$/lib/home.dart" />
+        <option value="$PROJECT_DIR$/pubspec.yaml" />
+        <option value="$PROJECT_DIR$/lib/SelectColorPage.dart" />
+        <option value="$PROJECT_DIR$/lib/main.dart" />
+        <option value="$PROJECT_DIR$/lib/select_category_page.dart" />
+        <option value="$PROJECT_DIR$/lib/select_color_page.dart" />
+        <option value="$PROJECT_DIR$/lib/select_typecategory_page.dart" />
+        <option value="$PROJECT_DIR$/lib/filter_page.dart" />
       </list>
     </option>
   </component>
@@ -159,9 +169,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
       <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -178,6 +186,8 @@
           <select />
         </subPane>
       </pane>
+      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -353,6 +363,7 @@
       <window_info anchor="right" id="Device File Explorer" order="5" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39975095" />
       <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Messages" order="13" weight="0.32876712" />
       <window_info anchor="right" id="Palette&#9;" order="8" />
       <window_info id="Image Layers" order="3" />
       <window_info anchor="right" id="Capture Analysis" order="6" />
@@ -361,11 +372,10 @@
       <window_info anchor="bottom" id="Terminal" order="11" />
       <window_info id="Captures" order="6" />
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32876712" />
       <window_info anchor="right" id="Theme Preview" order="9" />
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="right" id="Flutter Inspector" order="4" />
-      <window_info anchor="bottom" id="Messages" order="13" weight="0.32876712" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -382,16 +392,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="31" selection-start-line="4" selection-start-column="31" selection-end-line="4" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/database.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1215">
@@ -454,7 +454,7 @@
         <state relative-caret-position="15">
           <caret line="138" column="67" selection-start-line="138" selection-start-column="67" selection-end-line="138" selection-end-column="67" />
           <folding>
-            <element signature="e#0#39#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -517,13 +517,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/condition.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="20" selection-start-column="20" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/condition.dart" />
     <entry file="file://$PROJECT_DIR$/pubspec.yaml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -668,7 +662,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/database.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="436">
+        <state relative-caret-position="1680">
           <caret line="121" column="24" selection-start-line="121" selection-start-column="24" selection-end-line="121" selection-end-column="24" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
@@ -676,19 +670,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="39" selection-start-line="39" selection-end-line="39" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/sql.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
+        <state relative-caret-position="30">
           <caret line="3" column="32" selection-start-line="3" selection-start-column="32" selection-end-line="3" selection-end-column="32" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
@@ -696,17 +680,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/condition.dart">
+    <entry file="file://$PROJECT_DIR$/lib/condition.dart" />
+    <entry file="file://$PROJECT_DIR$/lib/outfit.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="20" selection-start-column="20" selection-end-column="20" />
+        <state relative-caret-position="334">
+          <caret line="39" column="36" selection-start-line="39" selection-start-column="36" selection-end-line="39" selection-end-column="36" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
+    <entry file="file://$PROJECT_DIR$/lib/item_details_page.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="16" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+        <state relative-caret-position="-1780">
+          <caret line="41" column="25" selection-start-line="41" selection-start-column="25" selection-end-line="41" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -717,42 +705,63 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/outfit.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="334">
-          <caret line="39" column="36" selection-start-line="39" selection-start-column="36" selection-end-line="39" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/typedef.dart">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/item_details_page.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="22" column="16" selection-start-line="22" selection-start-column="16" selection-end-line="22" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#32#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="30">
+          <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/filter_page.dart">
+    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="412">
-          <caret line="47" column="17" selection-start-line="47" selection-start-column="17" selection-end-line="47" selection-end-column="17" />
+        <state relative-caret-position="165">
+          <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="40" column="6" selection-start-line="40" selection-start-column="6" selection-end-line="40" selection-end-column="6" />
           <folding>
-            <element signature="e#0#32#0" expanded="true" />
+            <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/home.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1172">
-          <caret line="436" selection-start-line="436" selection-end-line="436" />
+        <state relative-caret-position="5833">
+          <caret line="432" column="18" selection-start-line="432" selection-start-column="18" selection-end-line="432" selection-end-column="18" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/filter_page_old.dart">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/select_color_page.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="39" selection-start-line="8" selection-start-column="39" selection-end-line="8" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/select_typecategory_page.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="109">
+          <caret line="41" column="28" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/filter_page.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-80">
+          <caret line="71" column="26" selection-start-line="71" selection-start-column="26" selection-end-line="71" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
           </folding>
         </state>
       </provider>

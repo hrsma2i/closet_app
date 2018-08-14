@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
+      //theme: new ThemeData.dark()
     );
   }
 }
