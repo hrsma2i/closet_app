@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
 import 'package:quiver/iterables.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import 'package:closet_app/database.dart';
 import 'package:closet_app/item.dart';
@@ -12,14 +13,16 @@ import 'package:closet_app/item_details_page.dart';
 import 'package:closet_app/utils.dart';
 import 'package:closet_app/sql.dart';
 import 'package:closet_app/typedef.dart';
-import 'package:closet_app/filter_page.dart';
+import 'package:closet_app/item_filter_page.dart';
+import 'package:closet_app/item_gridview_page.dart';
+import 'package:closet_app/items_model.dart';
 
 
-class HomeScreen extends StatelessWidget {
-  static List<ItemTopTab> itemTopTabs = [
-    ItemTopTab('owned'),
-    ItemTopTab('to buy'),
-    ItemTopTab('all'),
+class HomeScreen extends StatefulWidget {
+  final List<String> itemTabTitles = [
+    'owned',
+    'to buy',
+    'all',
   ];
 
   static List<OutfitTopTab> outfitTopTabs = [
@@ -28,13 +31,6 @@ class HomeScreen extends StatelessWidget {
     OutfitTopTab('all'),
   ];
 
-  static List<Widget> bottomPages = [
-    BottomPageWithTopTabs('Outfit', outfitTopTabs),
-    BottomPageWithTopTabs('Items',  itemTopTabs),
-    BottomPageWithTopTabs('Find',   [
-      FindOutfitTopTab('outfit'),
-    ]),
-  ];
 
   static List<String> names = [
     'Outfit',
@@ -53,55 +49,74 @@ class HomeScreen extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return BottomPageContainer(bottomPages, names, icons);
+  HomeScreenState createState() {
+    return new HomeScreenState();
   }
 }
 
-class BottomPageContainer extends StatefulWidget {
-  List<Widget> bottomPages;
-  List<String> names;
-  List<Widget> icons;
-
-  BottomPageContainer(this.bottomPages, this.names, this.icons);
-  @override
-  BottomPageContainerState createState() =>
-    new BottomPageContainerState(bottomPages, names, icons);
-}
-
-class BottomPageContainerState extends State<BottomPageContainer> {
-  List<Widget> bottomPages;
-  List<String> names;
-  List<Widget> icons;
-
+class HomeScreenState extends State<HomeScreen> {
   int index = 0;
+  List<String> itemTabTitles;
 
-  BottomPageContainerState(this.bottomPages, this.names, this.icons);
+  @override
+  void initState() {
+    itemTabTitles = [
+      'owned',
+      'to buy',
+      'all',
+    ];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      body: new Stack(
-        children: List<Offstage>.generate(
-          bottomPages.length,
-          (int i) => Offstage(
-            offstage: index != i,
-            child: new TickerMode(
-              enabled: index == i,
-              child: bottomPages[i]
+    List<BottomPageWithTopTabs> bottomPages = [
+      BottomPageWithTopTabs(
+        title: 'Outfits',
+        icon: new ImageIcon(
+          AssetImage('./icons/outfit_fill.png'),
+        ),
+        tabTitles: widget.itemTabTitles,
+        children: widget.itemTabTitles.map((tabTitle) =>
+            ItemGrid(queryName: tabTitle)
+        ).toList(),
+      ),
+      BottomPageWithTopTabs(
+        title: 'Items',
+        icon: new ImageIcon(
+          AssetImage('./icons/T_fill.png'),
+        ),
+        tabTitles: widget.itemTabTitles,
+        children: widget.itemTabTitles.map((tabTitle) =>
+            ItemGrid(queryName: tabTitle)
+        ).toList(),
+      ),
+    ];
+    return ScopedModel<ItemsModel>(
+      model: ItemsModel(),
+      child: new Scaffold(
+        body: new Stack(
+          children: List<Offstage>.generate(
+            bottomPages.length,
+            (int i) => Offstage(
+              offstage: index != i,
+              child: new TickerMode(
+                enabled: index == i,
+                child: bottomPages[i]
+              )
             )
           )
-        )
-      ),
-      bottomNavigationBar: new BottomNavigationBar(
-        currentIndex: index,
-        onTap: (int index) { setState((){ this.index = index; }); },
-        items: zip([icons, names]).map((icnm) =>
-          new BottomNavigationBarItem(
-            icon: icnm[0],
-            title: new Text(icnm[1]),
-          )
-        ).toList(),
+        ),
+        bottomNavigationBar: new BottomNavigationBar(
+          currentIndex: index,
+          onTap: (int index) { setState((){ this.index = index; }); },
+          items: bottomPages.map((btmPg) =>
+            new BottomNavigationBarItem(
+              icon: btmPg.icon,
+              title: new Text(btmPg.title),
+            )
+          ).toList(),
+        ),
       ),
     );
   }
@@ -109,26 +124,33 @@ class BottomPageContainerState extends State<BottomPageContainer> {
 
 
 class BottomPageWithTopTabs extends StatelessWidget {
-  String name;
-  List<TopTab> topTabs;
+  String title;
+  Widget icon;
+  List<String> tabTitles;
+  List<Widget> children;
 
-  BottomPageWithTopTabs(this.name, this.topTabs);
+  BottomPageWithTopTabs({
+    this.title,
+    this.icon,
+    this.tabTitles,
+    this.children
+  });
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: topTabs.length,
+      length: children.length,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(name),
+          title: Text(title),
           bottom: TabBar(
-            tabs: topTabs.map(
-                    (topTab) => new Tab(text: topTab.title)
+            tabs: tabTitles.map(
+                    (tabTitle) => new Tab(text: tabTitle)
             ).toList(),
           ),
         ),
         body: TabBarView(
-          children: topTabs,
+          children: children,
         ),
       ),
     );
@@ -224,13 +246,9 @@ class ItemCard extends StatelessWidget {
     return GestureDetector(
       onTap: (){
         Navigator.of(context).push(
-          new FadeRoute(
+          new MaterialPageRoute(
             builder: (BuildContext context) =>
                 new ItemDetailsPage(item, updateItem),
-            settings: new RouteSettings(
-              name: '/item_detail',
-              isInitialRoute: false
-            ),
           )
         );
       },

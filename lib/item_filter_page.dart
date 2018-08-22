@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:quiver/collection.dart';
 
 import 'package:closet_app/item.dart';
 import 'package:closet_app/select_color_page.dart';
@@ -16,14 +17,43 @@ class Condition {
   Condition(String this.key, String this.operation, String this.value);
 }
 
-class ConditionsModel extends Model {
-  final List<Condition> _conditions = new List();
+class ConditionModel extends Model {
+  String colorName;
+  String typecategory;
+  bool owned;
 
-  List<Condition> get conditions => _conditions;
+  ConditionModel(this.colorName, this.typecategory, this.owned);
 
-  void add(Condition condition) {
-    _conditions.add(condition);
-    notifyListeners();
+  String getSql() {
+    String sql = """
+                 SELECT * FROM ${Item.tblItem}
+                 """;
+
+    List<String> sqlParts = new List();
+
+    if ((colorName != null)
+        || (typecategory != null)
+        || (owned != null)) {
+      sql += "WHERE ";
+    }
+    if (colorName != null) {
+      sqlParts.add("""
+        ${Item.tblItem}.${Item.colColor} = "$colorName"
+      """);
+    }
+    if (typecategory != null) {
+      sqlParts.add("""
+        ${Item.tblItem}.${Item.colTypeCategory} = "$typecategory"
+      """);
+    }
+    if (owned != null) {
+      sqlParts.add("""
+        ${Item.tblItem}.${Item.colOwned} = ${owned?1:0}
+      """);
+    }
+    sql += sqlParts.join("AND") + ";";
+
+    return sql;
   }
 }
 
@@ -33,24 +63,21 @@ class FilterPage extends StatefulWidget {
 }
 
 class FilterPageState extends State<FilterPage> {
-  String sql = """
-               SELECT * FROM ${Item.tblItem}
-               """;
-  ConditionsModel conditionsModel = ConditionsModel();
+  ConditionModel condition = ConditionModel(
+    null,
+    null,
+    null,
+  );
 
   @override
   void initState() {
-    conditionsModel._conditions.addAll([
-      Condition("color", "=", "white"),
-      Condition("typecategory", "=", "T-shits"),
-   ]);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModel<ConditionsModel>(
-      model: conditionsModel,
+    return ScopedModel<ConditionModel>(
+      model: condition,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -60,9 +87,9 @@ class FilterPageState extends State<FilterPage> {
           padding: EdgeInsets.all(10.0),
           child: Column(
             children: [
-              ColorConditionRow(0),
+              ColorConditionRow(),
               Divider(),
-              TypeCategoryConditionRow(1),
+              TypeCategoryConditionRow(),
               Divider(),
               Row(
                 children: <Widget>[
@@ -75,7 +102,15 @@ class FilterPageState extends State<FilterPage> {
                       ),
                     )
                   ),
-                  Checkbox()
+                  Checkbox(
+                    tristate: true,
+                    value: condition.owned,
+                    onChanged: (bool value) {
+                      setState(() {
+                        condition.owned = value;
+                      });
+                    }
+                  )
                 ],
               ),
               Divider(),
@@ -85,15 +120,7 @@ class FilterPageState extends State<FilterPage> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.check),
           onPressed: (){
-            if (conditionsModel.conditions != null) {
-              sql += "WHERE "
-                + conditionsModel.conditions.map((cond) =>
-                    """
-                    ${Item.tblItem}.${cond.key} = "${cond.value}"
-                    """
-                  ).toList().join(" AND ")
-                +";";
-            }
+            String sql = condition.getSql();
             print(sql);
             Navigator.pop(context, sql);
           },
@@ -104,9 +131,8 @@ class FilterPageState extends State<FilterPage> {
 }
 
 class ColorConditionRow extends StatefulWidget {
-  int index;
 
-  ColorConditionRow(this.index);
+  ColorConditionRow();
 
   @override
   ColorConditionRowState createState() {
@@ -115,13 +141,12 @@ class ColorConditionRow extends StatefulWidget {
 }
 
 class ColorConditionRowState extends State<ColorConditionRow> {
-  Color _color = Colors.white;
+  //Color _color = null;
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ConditionsModel>(
-      builder: (context, _, model) {
-        Condition condition = model.conditions[widget.index];
+    return ScopedModelDescendant<ConditionModel>(
+      builder: (context, _, condition) {
         return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
@@ -135,13 +160,21 @@ class ColorConditionRowState extends State<ColorConditionRow> {
               )
             ),
             GestureDetector(
-              child: Container(
-                child: Card(
-                  color: _color,
+              child: condition.colorName != null
+                ? Container(
+                  child: Card(
+                    color: Name2Color[condition.colorName],
+                  ),
+                  width: 48.0,
+                  height: 48.0,
+                )
+                : Text(
+                  "all",
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                      fontSize: 20.0
+                  ),
                 ),
-                width: 48.0,
-                height: 48.0,
-              ),
               onTap: (){
                 Navigator.of(context)
                   .push(
@@ -150,10 +183,12 @@ class ColorConditionRowState extends State<ColorConditionRow> {
                         new SelectColorPage()
                     )
                   ).then((color) {
-                    condition.value = Color2Name[color];
-                    setState(() {
-                      _color = color;
-                    });
+                    print(color);
+                    condition.colorName = Name2Color.inverse[color];
+                    print(condition.colorName);
+                    //setState(() {
+                    //  _color = color;
+                    //});
                   });
               },
             ),
@@ -164,17 +199,16 @@ class ColorConditionRowState extends State<ColorConditionRow> {
   }
 }
 
-Map<Color, String> Color2Name = {
-  Colors.black:      "black",
-  Colors.white:      "white",
-  Color(0xFF6E6D51):   "green",
-  Color(0xFFC6B399):   "beige",
-};
+BiMap Name2Color = new BiMap()..addAll({
+  "black": Colors.black,
+  "white": Colors.white,
+  "green": Colors.green,
+  "beige": Color(0xFFC6B399),
+});
 
 class TypeCategoryConditionRow extends StatefulWidget {
-  int index;
 
-  TypeCategoryConditionRow(this.index);
+  TypeCategoryConditionRow();
 
   @override
   TypeCategoryConditionRowState createState() {
@@ -183,13 +217,11 @@ class TypeCategoryConditionRow extends StatefulWidget {
 }
 
 class TypeCategoryConditionRowState extends State<TypeCategoryConditionRow> {
-  String _typecategory = "T-shits";
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ConditionsModel>(
+    return ScopedModelDescendant<ConditionModel>(
         builder: (context, _, model) {
-          Condition condition = model.conditions[widget.index];
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
@@ -204,7 +236,9 @@ class TypeCategoryConditionRowState extends State<TypeCategoryConditionRow> {
               ),
               FlatButton(
                 child: Text(
-                  _typecategory,
+                  model.typecategory != null
+                    ? model.typecategory
+                    : "all",
                   textAlign: TextAlign.right,
                   style: TextStyle(
                       fontSize: 20.0
@@ -217,10 +251,7 @@ class TypeCategoryConditionRowState extends State<TypeCategoryConditionRow> {
                       new SelectTypeCategoryPage()
                     )
                   ).then((typecategory) {
-                    condition.value = typecategory;
-                    setState(() {
-                      _typecategory = typecategory;
-                    });
+                    model.typecategory = typecategory;
                   });
                 },
               ),
