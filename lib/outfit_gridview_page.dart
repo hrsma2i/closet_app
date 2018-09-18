@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
@@ -5,63 +6,63 @@ import 'package:scoped_model/scoped_model.dart';
 
 import 'package:closet_app/database.dart';
 import 'package:closet_app/sql.dart';
-import 'package:closet_app/item.dart';
-import 'package:closet_app/items_model.dart';
-import 'package:closet_app/item_details_page.dart';
-import 'package:closet_app/item_filter_page.dart';
+import 'package:closet_app/outfit.dart';
+import 'package:closet_app/outfits_model.dart';
+//import 'package:closet_app/outfit_details_page.dart';
+//import 'package:closet_app/outfit_filter_page.dart';
 
 
-class ItemGrid extends StatefulWidget {
+class OutfitGrid extends StatefulWidget {
   String queryName;
 
-  ItemGrid({this.queryName});
+  OutfitGrid({this.queryName});
 
   @override
-  ItemGridState createState() =>  ItemGridState();
+  OutfitGridState createState() =>  OutfitGridState();
 }
 
 
-class ItemGridState extends State<ItemGrid> {
-  final ItemsModel model = ItemsModel();
+class OutfitGridState extends State<OutfitGrid> {
+  final OutfitsModel model = OutfitsModel();
 
   @override
   void initState(){
-    updateItemsByQuery(sqlMapItem[widget.queryName]);
+    updateOutfitsByQuery(sqlMapOutfit[widget.queryName]);
     super.initState();
   }
 
-  void updateItemsByQuery(String sql) {
+  void updateOutfitsByQuery(String sql) {
     ClosetDatabase.get()
-      .getItems(sql)
-      .then((items) {
+      .getOutfits(sql)
+      .then((outfits) {
         setState(() {
-          model.updateItems(items);
+          model.updateOutfits(outfits);
         });
       });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModel<ItemsModel>(
+    return ScopedModel<OutfitsModel>(
       model: model,
       child: Scaffold(
         floatingActionButton: FancyFab(
-          heroTag: "item_${widget.queryName}_"
-            "${model.items}",
-          //updateItemsByQuery: updateItemsByQuery,
+          heroTag: "outfit_${widget.queryName}_"
+            "${model.outfits}",
+          //updateOutfitsByQuery: updateOutfitsByQuery,
         ),
-        body: model.items != null
+        body: model.outfits != null
           ? Padding(
               padding: EdgeInsets.all(2.5),
               child: GridView.builder(
                 padding: const EdgeInsets.all(2.5),
                 itemBuilder: (BuildContext context, int index) =>
-                 ItemCard(model.items[index]),
+                 OutfitCard(model.outfits[index]),
                 gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                  crossAxisCount: 2,
                   crossAxisSpacing: 2.5,
                 ),
-                itemCount: model.items.length,
+                itemCount: model.outfits.length,
               )
             )
           : Container()
@@ -70,33 +71,38 @@ class ItemGridState extends State<ItemGrid> {
   }
 }
 
-class ItemCard extends StatelessWidget {
-  Item item;
+class OutfitCard extends StatelessWidget {
+  Outfit outfit;
 
-  ItemCard(this.item);
+  OutfitCard(this.outfit);
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ItemsModel>(
+    return ScopedModelDescendant<OutfitsModel>(
       builder: (context, child, model){
         return GestureDetector(
           onTap: () {
-            Navigator.of(context).push(
-               MaterialPageRoute(
-                builder: (context) =>
-                  ItemDetailsPage(item)
-              )
-            ).then((item) {
-              model.updateItem(item);
-            });
+            //Navigator.of(context).push(
+            //  MaterialPageRoute(
+            //    builder: (context) =>
+            //      OutfitDetailsPage(outfit)
+            //  )
+            //).then((outfit) {
+            //  model.updateOutfit(outfit);
+            //});
           },
-          child:  Card(
-              child: Padding(
-                padding: EdgeInsets.all(3.0),
-                child: Image.asset(
-                    join('images', item.imageName)
-                ),
-              )
+          child: Card(
+            child: GridView.count(
+              primary: false,
+              padding: const EdgeInsets.all(1.0),
+              children: outfit.imageNames.map((imageName) =>
+                Image.asset(
+                  join('images', imageName)
+                )
+              ).toList(),
+              crossAxisSpacing: 0.0,
+              crossAxisCount: sqrt(outfit.imageNames.length).ceil(),
+            )
           ),
         );
       }
@@ -111,7 +117,7 @@ class FancyFab extends StatefulWidget {
   final String tooltip;
   final IconData icon;
 
-  //final ItemsUpdaterByQuery updateItemsByQuery;
+  //final OutfitsUpdaterByQuery updateOutfitsByQuery;
 
   FancyFab({
     this.heroTag,
@@ -119,7 +125,7 @@ class FancyFab extends StatefulWidget {
     this.tooltip,
     this.icon,
 
-    //this.updateItemsByQuery,
+    //this.updateOutfitsByQuery,
   });
 
   @override
@@ -211,18 +217,18 @@ class _FancyFabState extends State<FancyFab>
       child: FloatingActionButton(
         heroTag: "${widget.heroTag}_filter",
         onPressed: (){
-          Navigator.of(context).push(
-             MaterialPageRoute(
-              builder: (context) =>
-               FilterPage(),
-              settings:  RouteSettings(
-                  name: '/edit_filter',
-                  isInitialRoute: false
-              ),
-            )
-          ).then((sql){
-            //widget.updateItemsByQuery(sql);
-          });
+          //Navigator.of(context).push(
+          //   MaterialPageRoute(
+          //    builder: (context) =>
+          //     FilterPage(),
+          //    settings:  RouteSettings(
+          //        name: '/edit_filter',
+          //        isInitialRoute: false
+          //    ),
+          //  )
+          //).then((sql){
+          //  //widget.updateOutfitsByQuery(sql);
+          //});
         },
         tooltip: 'Filter',
         child: Icon(Icons.filter_list),
