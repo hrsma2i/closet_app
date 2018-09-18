@@ -21,67 +21,55 @@ class ItemGrid extends StatefulWidget {
   ItemGrid({this.queryName});
 
   @override
-  ItemGridState createState() => new ItemGridState();
+  ItemGridState createState() =>  ItemGridState();
 }
 
 
 class ItemGridState extends State<ItemGrid> {
-  //final ItemsModel model;
-  //List<Item> _items;
+  final ItemsModel model = ItemsModel();
 
   @override
   void initState(){
-    //updateItemsByQuery(sqlMapItem[widget.queryName]);
-    //_items = model.items;
+    updateItemsByQuery(sqlMapItem[widget.queryName]);
     super.initState();
   }
 
-  /*
   void updateItemsByQuery(String sql) {
-    print('updateItemsByQuery');
     ClosetDatabase.get()
       .getItems(sql)
       .then((items) {
         setState(() {
-          _items = items;
+          model.updateItems(items);
         });
-      }
-    );
+      });
   }
-  */
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ItemsModel>(
-      builder: (context, child, model) {
-        return Scaffold(
-          floatingActionButton: new FancyFab(
-            heroTag: "item_${widget.queryName}",
-            //updateItemsByQuery: updateItemsByQuery,
-          ),
-          body: model.items != null
-            ? () {
-              print('build ItemGrid');
-              if (model.items.length == 0) {
-                model.updateItemsByQuery(sqlMapItem[widget.queryName]);
-              }
-              return new Padding(
-                  padding: EdgeInsets.all(2.5),
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(2.5),
-                    itemBuilder: (BuildContext context, int index) =>
-                    new ItemCard(model.items[index]),
-                    gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 2.5,
-                    ),
-                    itemCount: model.items.length,
-                  )
-              );
-            }()
-            : Container()
-        );
-      }
+    return ScopedModel<ItemsModel>(
+      model: model,
+      child: Scaffold(
+        floatingActionButton: FancyFab(
+          heroTag: "item_${widget.queryName}_"
+            "${model.items}",
+          //updateItemsByQuery: updateItemsByQuery,
+        ),
+        body: model.items != null
+          ? Padding(
+              padding: EdgeInsets.all(2.5),
+              child: GridView.builder(
+                padding: const EdgeInsets.all(2.5),
+                itemBuilder: (BuildContext context, int index) =>
+                 ItemCard(model.items[index]),
+                gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 2.5,
+                ),
+                itemCount: model.items.length,
+              )
+            )
+          : Container()
+      )
     );
   }
 }
@@ -93,23 +81,29 @@ class ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-            new MaterialPageRoute(
+    return ScopedModelDescendant<ItemsModel>(
+      builder: (context, child, model){
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+               MaterialPageRoute(
                 builder: (context) =>
-                ItemDetailsPage(item.itemId)
-            )
+                  ItemDetailsPage(item)
+              )
+            ).then((item) {
+              model.updateItem(item);
+            });
+          },
+          child:  Card(
+              child: Padding(
+                padding: EdgeInsets.all(3.0),
+                child: Image.asset(
+                    join('images', item.imageName)
+                ),
+              )
+          ),
         );
-      },
-      child: new Card(
-          child: Padding(
-            padding: EdgeInsets.all(3.0),
-            child: Image.asset(
-                join('images', item.imageName)
-            ),
-          )
-      ),
+      }
     );
   }
 }
@@ -206,7 +200,7 @@ class _FancyFabState extends State<FancyFab>
   }
 
   Widget sort(){
-    return new Container(
+    return  Container(
       child: FloatingActionButton(
         heroTag: "${widget.heroTag}_sort",
         onPressed: null,
@@ -217,15 +211,15 @@ class _FancyFabState extends State<FancyFab>
   }
 
   Widget filter(BuildContext context){
-    return new Container(
+    return  Container(
       child: FloatingActionButton(
         heroTag: "${widget.heroTag}_filter",
         onPressed: (){
           Navigator.of(context).push(
-            new MaterialPageRoute(
+             MaterialPageRoute(
               builder: (context) =>
-              new FilterPage(),
-              settings: new RouteSettings(
+               FilterPage(),
+              settings:  RouteSettings(
                   name: '/edit_filter',
                   isInitialRoute: false
               ),

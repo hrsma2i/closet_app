@@ -92,31 +92,28 @@ class HomeScreenState extends State<HomeScreen> {
         ).toList(),
       ),
     ];
-    return ScopedModel<ItemsModel>(
-      model: ItemsModel(),
-      child: new Scaffold(
-        body: new Stack(
-          children: List<Offstage>.generate(
-            bottomPages.length,
-            (int i) => Offstage(
-              offstage: index != i,
-              child: new TickerMode(
-                enabled: index == i,
-                child: bottomPages[i]
-              )
+    return new Scaffold(
+      body: new Stack(
+        children: List<Offstage>.generate(
+          bottomPages.length,
+          (int i) => Offstage(
+            offstage: index != i,
+            child: new TickerMode(
+              enabled: index == i,
+              child: bottomPages[i]
             )
           )
-        ),
-        bottomNavigationBar: new BottomNavigationBar(
-          currentIndex: index,
-          onTap: (int index) { setState((){ this.index = index; }); },
-          items: bottomPages.map((btmPg) =>
-            new BottomNavigationBarItem(
-              icon: btmPg.icon,
-              title: new Text(btmPg.title),
-            )
-          ).toList(),
-        ),
+        )
+      ),
+      bottomNavigationBar: new BottomNavigationBar(
+        currentIndex: index,
+        onTap: (int index) { setState((){ this.index = index; }); },
+        items: bottomPages.map((btmPg) =>
+          new BottomNavigationBarItem(
+            icon: btmPg.icon,
+            title: new Text(btmPg.title),
+          )
+        ).toList(),
       ),
     );
   }
@@ -248,7 +245,7 @@ class ItemCard extends StatelessWidget {
         Navigator.of(context).push(
           new MaterialPageRoute(
             builder: (BuildContext context) =>
-                new ItemDetailsPage(item, updateItem),
+                new ItemDetailsPage(item),
           )
         );
       },

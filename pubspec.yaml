@@ -4,9 +4,9 @@ description: A new Flutter project.
 dependencies:
   flutter:
     sdk: flutter
-  quiver: '>=0.29.0 <0.30.0'
+  quiver: any #'>=0.29.0 <0.30.0'
   image_picker: '>=0.1.2 <2.0.0'
-  path_provider: ^0.3.1
+  path_provider: any #^0.3.1
   sqflite: any
   path: any
   scoped_model: any
