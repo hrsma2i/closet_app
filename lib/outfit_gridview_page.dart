@@ -9,7 +9,7 @@ import 'package:closet_app/sql.dart';
 import 'package:closet_app/outfit.dart';
 import 'package:closet_app/outfits_model.dart';
 //import 'package:closet_app/outfit_details_page.dart';
-//import 'package:closet_app/outfit_filter_page.dart';
+import 'package:closet_app/outfit_filter_page.dart';
 
 
 class OutfitGrid extends StatefulWidget {
@@ -46,10 +46,10 @@ class OutfitGridState extends State<OutfitGrid> {
     return ScopedModel<OutfitsModel>(
       model: model,
       child: Scaffold(
-        floatingActionButton: FancyFab(
+        floatingActionButton: FancyFabOutfit(
           heroTag: "outfit_${widget.queryName}_"
             "${model.outfits}",
-          //updateOutfitsByQuery: updateOutfitsByQuery,
+          updateCallback: updateOutfitsByQuery,
         ),
         body: model.outfits != null
           ? Padding(
@@ -111,28 +111,28 @@ class OutfitCard extends StatelessWidget {
 }
 
 
-class FancyFab extends StatefulWidget {
+class FancyFabOutfit extends StatefulWidget {
   final Object heroTag;
   final Function onPressed;
   final String tooltip;
   final IconData icon;
 
-  //final OutfitsUpdaterByQuery updateOutfitsByQuery;
+  final Function updateCallback;
 
-  FancyFab({
+  FancyFabOutfit({
     this.heroTag,
     this.onPressed,
     this.tooltip,
     this.icon,
 
-    //this.updateOutfitsByQuery,
+    this.updateCallback,
   });
 
   @override
-  _FancyFabState createState() => _FancyFabState();
+  _FancyFabOutfitState createState() => _FancyFabOutfitState();
 }
 
-class _FancyFabState extends State<FancyFab>
+class _FancyFabOutfitState extends State<FancyFabOutfit>
     with SingleTickerProviderStateMixin {
   bool isOpened = false;
   AnimationController _animationController;
@@ -204,7 +204,7 @@ class _FancyFabState extends State<FancyFab>
   Widget sort(){
     return  Container(
       child: FloatingActionButton(
-        heroTag: "${widget.heroTag}_sort",
+        heroTag: "${widget.heroTag}_sort_outfit",
         onPressed: null,
         tooltip: 'Sort',
         child: Icon(Icons.sort),
@@ -215,20 +215,20 @@ class _FancyFabState extends State<FancyFab>
   Widget filter(BuildContext context){
     return  Container(
       child: FloatingActionButton(
-        heroTag: "${widget.heroTag}_filter",
+        heroTag: "${widget.heroTag}_filter_outfit",
         onPressed: (){
-          //Navigator.of(context).push(
-          //   MaterialPageRoute(
-          //    builder: (context) =>
-          //     FilterPage(),
-          //    settings:  RouteSettings(
-          //        name: '/edit_filter',
-          //        isInitialRoute: false
-          //    ),
-          //  )
-          //).then((sql){
-          //  //widget.updateOutfitsByQuery(sql);
-          //});
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>
+                OutfitFilterPage(),
+              settings:  RouteSettings(
+                name: '/edit_filter',
+                isInitialRoute: false
+              ),
+            )
+          ).then((sql){
+            widget.updateCallback(sql);
+          });
         },
         tooltip: 'Filter',
         child: Icon(Icons.filter_list),
@@ -238,7 +238,7 @@ class _FancyFabState extends State<FancyFab>
 
   Widget toggle() {
     return FloatingActionButton(
-      heroTag: "${widget.heroTag}_toggle",
+      heroTag: "${widget.heroTag}_toggle_outfit",
       backgroundColor: _animateColor.value,
       onPressed: animate,
       tooltip: 'Toggle',

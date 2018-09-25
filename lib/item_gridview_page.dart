@@ -91,12 +91,12 @@ class ItemCard extends StatelessWidget {
             });
           },
           child:  Card(
-              child: Padding(
-                padding: EdgeInsets.all(3.0),
-                child: Image.asset(
-                    join('images', item.imageName)
-                ),
-              )
+            child: Padding(
+              padding: EdgeInsets.all(3.0),
+              child: Image.asset(
+                  join('images', item.imageName)
+              ),
+            )
           ),
         );
       }
