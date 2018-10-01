@@ -23,6 +23,7 @@ class ItemGrid extends StatefulWidget {
 
 class ItemGridState extends State<ItemGrid> {
   final ItemsModel model = ItemsModel();
+  List<Item> _items;
 
   @override
   void initState(){
@@ -30,76 +31,80 @@ class ItemGridState extends State<ItemGrid> {
     super.initState();
   }
 
+  void updateItem(Item item) {
+    ClosetDatabase.get()
+        .updateItem(item);
+    updateItemsByQuery(sqlMapItem[widget.queryName]);
+  }
+
   void updateItemsByQuery(String sql) {
     ClosetDatabase.get()
       .getItems(sql)
       .then((items) {
         setState(() {
-          model.updateItems(items);
+          //model.updateItems(items);
+          _items = items;
         });
       });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModel<ItemsModel>(
-      model: model,
-      child: Scaffold(
-        floatingActionButton: FancyFab(
-          heroTag: "item_${widget.queryName}_"
-            "${model.items}",
-          //updateItemsByQuery: updateItemsByQuery,
-        ),
-        body: model.items != null
-          ? Padding(
-              padding: EdgeInsets.all(2.5),
-              child: GridView.builder(
-                padding: const EdgeInsets.all(2.5),
-                itemBuilder: (BuildContext context, int index) =>
-                 ItemCard(model.items[index]),
-                gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 2.5,
-                ),
-                itemCount: model.items.length,
-              )
+    return Scaffold(
+      floatingActionButton: FancyFab(
+        heroTag: "item_${widget.queryName}_"
+          "$_items",
+        //updateItemsByQuery: updateItemsByQuery,
+      ),
+      body: _items != null
+        ? Padding(
+            padding: EdgeInsets.all(2.5),
+            child: GridView.builder(
+              padding: const EdgeInsets.all(2.5),
+              itemBuilder: (BuildContext context, int index) =>
+               ItemCard(
+                 item: _items[index],
+                 callbackUpdate: updateItem,
+               ),
+              gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 2.5,
+              ),
+              itemCount: _items.length,
             )
-          : Container()
-      )
+          )
+        : Container()
     );
   }
 }
 
 class ItemCard extends StatelessWidget {
   Item item;
+  Function callbackUpdate;
 
-  ItemCard(this.item);
+  ItemCard({this.item, this.callbackUpdate});
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ItemsModel>(
-      builder: (context, child, model){
-        return GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(
-               MaterialPageRoute(
-                builder: (context) =>
-                  ItemDetailsPage(item)
-              )
-            ).then((item) {
-              model.updateItem(item);
-            });
-          },
-          child:  Card(
-            child: Padding(
-              padding: EdgeInsets.all(3.0),
-              child: Image.asset(
-                  join('images', item.imageName)
-              ),
-            )
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+           MaterialPageRoute(
+            builder: (context) =>
+              ItemDetailsPage(item)
+          )
+        ).then((item) {
+          callbackUpdate(item);
+        });
+      },
+      child:  Card(
+        child: Padding(
+          padding: EdgeInsets.all(3.0),
+          child: Image.asset(
+              join('images', item.imageName)
           ),
-        );
-      }
+        )
+      ),
     );
   }
 }

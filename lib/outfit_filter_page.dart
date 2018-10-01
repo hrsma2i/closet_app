@@ -5,6 +5,7 @@ import 'package:closet_app/item.dart';
 import 'package:closet_app/outfit.dart';
 import 'package:closet_app/database.dart';
 import 'package:closet_app/sql.dart';
+import 'package:closet_app/item_gridview_page.dart';
 
 
 //class ConditionModel extends Model {
@@ -254,7 +255,20 @@ class AddButton extends StatelessWidget {
           icon: Icon(Icons.add),
           iconSize: 50.0,
           color: Theme.of(context).dividerColor,
-          onPressed: (){},
+          onPressed: (){
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                    ItemGrid(queryName: 'all'),
+                settings:  RouteSettings(
+                    name: '/edit_filter',
+                    isInitialRoute: false
+                ),
+              )
+            );
+            //).then((items){
+            //});
+          },
         ),
         decoration: BoxDecoration(
           border: Border.all(

@@ -9,17 +9,30 @@ import 'package:closet_app/database.dart';
 import 'package:closet_app/items_model.dart';
 
 
-class ItemDetailsPage extends StatelessWidget {
+class ItemDetailsPage extends StatefulWidget {
   Item item;
 
   ItemDetailsPage(this.item);
+
+  @override
+  ItemDetailsPageState createState() {
+    return new ItemDetailsPageState();
+  }
+}
+
+class ItemDetailsPageState extends State<ItemDetailsPage> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title:  Text(
-          "${item.color} ${item.category}"
+          "${widget.item.color} ${widget.item.category}"
         ),
         //backgroundColor: Colors.black,
         //elevation: 0.0,
@@ -31,114 +44,15 @@ class ItemDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Image.asset(
-                    join("images", item.imageName),
-                    fit: BoxFit.cover,
-                  ),
-                )
-              ),
+              ImageRow(),
               SizedBox(height: 16.0),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      "category",
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontFamily: "CrimsonText",
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () {},
-                    child: Text(
-                      item.category,
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontFamily: "CrimsonText",
-                        fontWeight: FontWeight.w400,
-                        color: Colors.blue,
-                      ),
-                    )
-                  )
-                ],
-              ),
+              CategoryRow(),
               Divider(height: 10.0, color: Colors.black38),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      "color",
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontFamily: "CrimsonText",
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () {},
-                    child: Text(
-                      item.color,
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontFamily: "CrimsonText",
-                        fontWeight: FontWeight.w400,
-                        color: Colors.blue,
-                      ),
-                    )
-                  )
-                ],
-              ),
+              ColorRow(),
               Divider(height: 10.0, color: Colors.black38),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      "owned",
-                      style: const TextStyle(
-                        fontSize: 20.0,
-                        fontFamily: "CrimsonText",
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                  Checkbox(
-                    value: item.owned,
-                    onChanged: (bool value) {
-                      item.owned = value;
-                      //model.updateItem(item);
-                      ClosetDatabase.get().updateItem(item);
-                    },
-                  ),
-                ],
-              ),
+              OwnedRow(),
               Divider(height: 10.0, color: Colors.black38),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: IconButtonText(
-                      onClick: () {},
-                      iconData: Icons.store,
-                      text: "Search store",
-                      selected: false,
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButtonText(
-                      onClick: () {},
-                      iconData: Icons.store,
-                      text: "Search store",
-                      selected: false,
-                    ),
-                  ),
-                ],
-              ),
+              OtherRow1(),
               Divider(height: 32.0, color: Colors.black38),
               Text(
                 "Description",
@@ -158,6 +72,126 @@ class ItemDetailsPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget ImageRow() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Center(
+        child: Image.asset(
+          join("images", widget.item.imageName),
+          fit: BoxFit.cover,
+        ),
+      )
+    );
+  }
+
+  Widget CategoryRow() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Text(
+            "category",
+            style: const TextStyle(
+              fontSize: 20.0,
+              fontFamily: "CrimsonText",
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        FlatButton(
+            onPressed: () {},
+            child: Text(
+              widget.item.category,
+              style: const TextStyle(
+                fontSize: 20.0,
+                fontFamily: "CrimsonText",
+                fontWeight: FontWeight.w400,
+                color: Colors.blue,
+              ),
+            )
+        )
+      ],
+    );
+  }
+
+  Widget ColorRow() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Text(
+            "color",
+            style: const TextStyle(
+              fontSize: 20.0,
+              fontFamily: "CrimsonText",
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        FlatButton(
+          onPressed: () {},
+          child: Text(
+            widget.item.color,
+            style: const TextStyle(
+              fontSize: 20.0,
+              fontFamily: "CrimsonText",
+              fontWeight: FontWeight.w400,
+              color: Colors.blue,
+            ),
+          )
+        )
+      ],
+    );
+  }
+
+  Widget OwnedRow() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Expanded(
+          child: Text(
+            "owned",
+            style: const TextStyle(
+              fontSize: 20.0,
+              fontFamily: "CrimsonText",
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        Checkbox(
+          value: widget.item.owned,
+          onChanged: (bool value) {
+            setState(() {
+              widget.item.owned = value;
+            });
+            ClosetDatabase.get().updateItem(widget.item);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget OtherRow1() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: IconButtonText(
+            onClick: () {},
+            iconData: Icons.store,
+            text: "Search store",
+            selected: false,
+          ),
+        ),
+        Expanded(
+          child: IconButtonText(
+            onClick: () {},
+            iconData: Icons.store,
+            text: "Search store",
+            selected: false,
+          ),
+        ),
+      ],
     );
   }
 }
