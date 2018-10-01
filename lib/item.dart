@@ -53,4 +53,6 @@ class Item {
       colOwned:        owned == true ? 1 : 0,
     };
   }
+
+  String get name => "${color}_$category";
 }

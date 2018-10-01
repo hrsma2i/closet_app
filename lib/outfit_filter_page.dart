@@ -8,44 +8,11 @@ import 'package:closet_app/sql.dart';
 import 'package:closet_app/item_gridview_page.dart';
 
 
-//class ConditionModel extends Model {
-//  String colorName;
-//  String typecategory;
-//  bool owned;
-//
-//  ConditionModel(this.colorName, this.typecategory, this.owned);
-//
-//  String getSql() {
-//
-//    List<String> sqlParts = new List();
-//
-//    if ((colorName != null)
-//        || (typecategory != null)
-//        || (owned != null)) {
-//      sql += "WHERE ";
-//    }
-//    if (colorName != null) {
-//      sqlParts.add("""
-//        ${Item.tblItem}.${Item.colColor} = "$colorName"
-//      """);
-//    }
-//    if (typecategory != null) {
-//      sqlParts.add("""
-//        ${Item.tblItem}.${Item.colTypeCategory} = "$typecategory"
-//      """);
-//    }
-//    if (owned != null) {
-//      sqlParts.add("""
-//        ${Item.tblItem}.${Item.colOwned} = ${owned?1:0}
-//      """);
-//    }
-//    sql += sqlParts.join("AND") + ";";
-//
-//    return sql;
-//  }
-//}
-
 class OutfitFilterPage extends StatefulWidget {
+  String originalQuery;
+
+  OutfitFilterPage({this.originalQuery});
+
   @override
   OutfitFilterPageState createState() => OutfitFilterPageState();
 }
@@ -85,7 +52,7 @@ class OutfitFilterPageState extends State<OutfitFilterPage> {
         child: Icon(Icons.check),
         heroTag: null,
         onPressed: () {
-          String sql = getSql();
+          String sql = getSql(widget.originalQuery);
           print(sql);
           Navigator.pop(context, sql);
         }
@@ -93,29 +60,20 @@ class OutfitFilterPageState extends State<OutfitFilterPage> {
     );
   }
 
-  String getSql() {
+  String getSql(String originalQuery) {
     String sqlIncluded = rowIncluded.items.map((item) =>
       "${Item.colItemId} == ${item.itemId}"
-    ).toList().join('\n AND ');
+    ).toList().join('\n OR ');
     String sqlExcluded = rowExcluded.items.map((item) =>
     "${Item.colItemId} == ${item.itemId}"
-    ).toList().join('\n AND ');
+    ).toList().join('\n OR ');
 
     String sql = """
       SELECT ${Outfit.colOutfitId},
              ${Outfit.colItemIds},
              ${Outfit.colImageNames}
       FROM(
-        SELECT ${Outfit.colOutfitId},
-          GROUP_CONCAT(${Item.tblItem}.${Item.colItemId}   , ',')
-            AS ${Outfit.colItemIds},
-          GROUP_CONCAT(${Item.tblItem}.${Item.colImageName}, ',')
-            AS ${Outfit.colImageNames}
-        FROM ${Outfit.tblLink}
-          INNER JOIN ${Item.tblItem}
-            ON ${Outfit.tblLink}.${Item.colItemId}
-             = ${Item.tblItem}.${Item.colItemId}
-        GROUP BY ${Outfit.tblLink}.${Outfit.colOutfitId}
+        ${originalQuery.replaceAll(";", "")}
       )
       WHERE """;
 
@@ -123,9 +81,17 @@ class OutfitFilterPageState extends State<OutfitFilterPage> {
       sql +="""
         ${Outfit.colOutfitId} IN (
           SELECT ${Outfit.colOutfitId}
-          FROM ${Outfit.tblLink}
-          WHERE """;
+          FROM(
+            SELECT ${Outfit.colOutfitId},
+              COUNT(${Item.colItemId}) AS num_items
+            FROM ${Outfit.tblLink}
+            WHERE """;
       sql += sqlIncluded;
+      sql += """
+            GROUP BY ${Outfit.colOutfitId}
+          )
+          WHERE num_items == ${rowIncluded.items.length}
+      """;
       sql += ")";
     }
     if (rowExcluded.items.isNotEmpty) {
@@ -197,14 +163,15 @@ class ItemsRowState extends State<ItemsRow> {
   void initState(){
 
     //---example----
-    ClosetDatabase.get()
-      .getItems(sqlMapItem['to buy'])
-      .then((items) {
-        setState(() {
-          widget.items = items;
-        });
-      });
+    //ClosetDatabase.get()
+    //  .getItems(sqlMapItem['to buy'])
+    //  .then((items) {
+    //    setState(() {
+    //      widget.items = items;
+    //    });
+    //  });
     //---example----
+    widget.items = [];
 
     super.initState();
   }
@@ -224,7 +191,7 @@ class ItemsRowState extends State<ItemsRow> {
       )
     ).toList();
 
-    itemCards.add(AddButton());
+    itemCards.add(AddButton(context));
 
     return Container(
       height: 160.0,
@@ -235,17 +202,8 @@ class ItemsRowState extends State<ItemsRow> {
       ),
     );
   }
-}
 
-
-class AddButton extends StatelessWidget {
-  String title;
-  Color color;
-
-  AddButton({this.title, this.color});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget AddButton(BuildContext context) {
     return Container(
       height: 160.0,
       width: 160.0,
@@ -259,15 +217,20 @@ class AddButton extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) =>
-                    ItemGrid(queryName: 'all'),
+                  ItemGrid(
+                    queryName: 'owned',
+                    selectable: true,
+                  ),
                 settings:  RouteSettings(
-                    name: '/edit_filter',
-                    isInitialRoute: false
+                  name: '/edit_filter',
+                  isInitialRoute: false
                 ),
               )
-            );
-            //).then((items){
-            //});
+            ).then((items){
+              setState(() {
+                widget.items.addAll(items);
+              });
+            });
           },
         ),
         decoration: BoxDecoration(

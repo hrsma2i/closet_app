@@ -50,6 +50,7 @@ class OutfitGridState extends State<OutfitGrid> {
           heroTag: "outfit_${widget.queryName}_"
             "${model.outfits}",
           updateCallback: updateOutfitsByQuery,
+          query: sqlMapOutfit[widget.queryName],
         ),
         body: model.outfits != null
           ? Padding(
@@ -118,6 +119,7 @@ class FancyFabOutfit extends StatefulWidget {
   final IconData icon;
 
   final Function updateCallback;
+  final String query;
 
   FancyFabOutfit({
     this.heroTag,
@@ -126,6 +128,7 @@ class FancyFabOutfit extends StatefulWidget {
     this.icon,
 
     this.updateCallback,
+    this.query,
   });
 
   @override
@@ -220,7 +223,7 @@ class _FancyFabOutfitState extends State<FancyFabOutfit>
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) =>
-                OutfitFilterPage(),
+                OutfitFilterPage(originalQuery: widget.query),
               settings:  RouteSettings(
                 name: '/edit_filter',
                 isInitialRoute: false

@@ -13,8 +13,9 @@ import 'package:closet_app/item_filter_page.dart';
 
 class ItemGrid extends StatefulWidget {
   String queryName;
+  bool selectable;
 
-  ItemGrid({this.queryName});
+  ItemGrid({this.queryName, this.selectable=false});
 
   @override
   ItemGridState createState() =>  ItemGridState();
@@ -24,9 +25,11 @@ class ItemGrid extends StatefulWidget {
 class ItemGridState extends State<ItemGrid> {
   final ItemsModel model = ItemsModel();
   List<Item> _items;
+  List<Item> _selectedItems;
 
   @override
   void initState(){
+    _selectedItems = [];
     updateItemsByQuery(sqlMapItem[widget.queryName]);
     super.initState();
   }
@@ -54,7 +57,9 @@ class ItemGridState extends State<ItemGrid> {
       floatingActionButton: FancyFab(
         heroTag: "item_${widget.queryName}_"
           "$_items",
-        //updateItemsByQuery: updateItemsByQuery,
+        callbackUpdate: updateItemsByQuery,
+        selectable: widget.selectable,
+        items: _selectedItems,
       ),
       body: _items != null
         ? Padding(
@@ -64,7 +69,7 @@ class ItemGridState extends State<ItemGrid> {
               itemBuilder: (BuildContext context, int index) =>
                ItemCard(
                  item: _items[index],
-                 callbackUpdate: updateItem,
+                 context: context,
                ),
               gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
@@ -76,37 +81,62 @@ class ItemGridState extends State<ItemGrid> {
         : Container()
     );
   }
-}
 
-class ItemCard extends StatelessWidget {
-  Item item;
-  Function callbackUpdate;
+  Widget ItemCard({Item item, BuildContext context}) {
+    bool selected = _selectedItems.contains(item);
+    Widget image = Image.asset(join('images', item.imageName));
 
-  ItemCard({this.item, this.callbackUpdate});
-
-  @override
-  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-           MaterialPageRoute(
-            builder: (context) =>
-              ItemDetailsPage(item)
-          )
-        ).then((item) {
-          callbackUpdate(item);
-        });
+        if (!widget.selectable) {
+          Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (context) =>
+                      ItemDetailsPage(item)
+              )
+          ).then((item) {
+            updateItem(item);
+          });
+        } else {
+          if (selected) {
+            setState(() {
+              _selectedItems.remove(item);
+            });
+          } else {
+            setState(() {
+              _selectedItems.add(item);
+            });
+          }
+          selected = !selected;
+        }
       },
-      child:  Card(
-        child: Padding(
-          padding: EdgeInsets.all(3.0),
-          child: Image.asset(
-              join('images', item.imageName)
-          ),
-        )
+      child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(3.0),
+            child: widget.selectable
+              ? Stack(
+                children: <Widget>[
+                  image,
+                  selectedMark(selected),
+                ],
+              )
+              : image
+          )
       ),
     );
   }
+
+  Widget selectedMark(selected) {
+    return Container(
+      height: 30.0,
+      width: 30.0,
+      alignment: Alignment.center,
+      child: selected
+        ? Icon(Icons.check_circle)
+        : Icon(Icons.check_circle_outline),
+    );
+  }
+
 }
 
 
@@ -115,21 +145,24 @@ class FancyFab extends StatefulWidget {
   final Function onPressed;
   final String tooltip;
   final IconData icon;
-
-  //final ItemsUpdaterByQuery updateItemsByQuery;
+  final Function callbackUpdate;
+  bool selectable;
+  List<Item> items;
 
   FancyFab({
     this.heroTag,
     this.onPressed,
     this.tooltip,
     this.icon,
-
-    //this.updateItemsByQuery,
+    this.callbackUpdate,
+    this.selectable,
+    this.items,
   });
 
   @override
   _FancyFabState createState() => _FancyFabState();
 }
+
 
 class _FancyFabState extends State<FancyFab>
     with SingleTickerProviderStateMixin {
@@ -186,6 +219,36 @@ class _FancyFabState extends State<FancyFab>
   }
 
   @override
+  Widget build(BuildContext context) {
+    List<Widget> buttons = [
+      sort(),
+      filter(context),
+    ];
+
+    if (widget.selectable) {
+      buttons.insert(0, check(context));
+    }
+
+    buttons = List.generate(buttons.length, (i) =>
+      Transform(
+        transform: Matrix4.translationValues(
+          0.0,
+          _translateButton.value * (buttons.length-i),
+          0.0,
+        ),
+        child: buttons[i],
+      )
+    );
+
+    buttons.add(toggle());
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: buttons,
+    );
+  }
+
+  @override
   dispose(){
     _animationController.dispose();
     super.dispose();
@@ -226,7 +289,7 @@ class _FancyFabState extends State<FancyFab>
               ),
             )
           ).then((sql){
-            //widget.updateItemsByQuery(sql);
+            widget.callbackUpdate(sql);
           });
         },
         tooltip: 'Filter',
@@ -248,29 +311,17 @@ class _FancyFabState extends State<FancyFab>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-        Transform(
-          transform: Matrix4.translationValues(
-            0.0,
-            _translateButton.value * 2.0,
-            0.0,
-          ),
-          child: sort(),
-        ),
-        Transform(
-          transform: Matrix4.translationValues(
-            0.0,
-            _translateButton.value * 1.0,
-            0.0,
-          ),
-          child: filter(context),
-        ),
-        toggle(),
-      ],
+  Widget check(context) {
+    return FloatingActionButton(
+      heroTag: "${widget.heroTag}_check",
+      onPressed: (){
+        Navigator.pop(context, widget.items);
+        for (Item item in widget.items) {
+          print(item.name);
+        }
+      },
+      tooltip: 'Check',
+      child: Icon(Icons.check),
     );
   }
 }
