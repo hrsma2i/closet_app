@@ -1,13 +1,10 @@
-import 'package:path/path.dart';
-import 'package:meta/meta.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:quiver/collection.dart';
 
 import 'package:closet_app/item.dart';
 import 'package:closet_app/select_color_page.dart';
 import 'package:closet_app/select_typecategory_page.dart';
+import 'package:closet_app/color.dart';
 
 class Condition {
   String key;
@@ -163,7 +160,7 @@ class ColorConditionRowState extends State<ColorConditionRow> {
               child: condition.colorName != null
                 ? Container(
                   child: Card(
-                    color: Name2Color[condition.colorName],
+                    color: name2color[condition.colorName],
                   ),
                   width: 48.0,
                   height: 48.0,
@@ -182,9 +179,9 @@ class ColorConditionRowState extends State<ColorConditionRow> {
                         builder: (BuildContext context) =>
                         new SelectColorPage()
                     )
-                  ).then((color) {
-                    print(color);
-                    condition.colorName = Name2Color.inverse[color];
+                  ).then((colorName) {
+                    print(colorName);
+                    condition.colorName = colorName;
                     print(condition.colorName);
                     //setState(() {
                     //  _color = color;
@@ -199,12 +196,6 @@ class ColorConditionRowState extends State<ColorConditionRow> {
   }
 }
 
-BiMap Name2Color = new BiMap()..addAll({
-  "black": Colors.black,
-  "white": Colors.white,
-  "green": Colors.green,
-  "beige": Color(0xFFC6B399),
-});
 
 class TypeCategoryConditionRow extends StatefulWidget {
 

@@ -51,23 +51,6 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
               ColorRow(),
               Divider(height: 10.0, color: Colors.black38),
               OwnedRow(),
-              Divider(height: 10.0, color: Colors.black38),
-              OtherRow1(),
-              Divider(height: 32.0, color: Colors.black38),
-              Text(
-                "Description",
-                style: const TextStyle(
-                  fontSize: 20.0,
-                  fontFamily: "CrimsonText",
-                ),
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                "Description will be here.",
-                style: const TextStyle(
-                  fontSize: 16.0,
-                ),
-              ),
             ],
           ),
         ),
@@ -101,9 +84,11 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
           ),
         ),
         FlatButton(
-            onPressed: () {},
+            onPressed: () {
+              
+            },
             child: Text(
-              widget.item.category,
+              widget.item.typeCategory,
               style: const TextStyle(
                 fontSize: 20.0,
                 fontFamily: "CrimsonText",
@@ -167,29 +152,6 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
             });
             ClosetDatabase.get().updateItem(widget.item);
           },
-        ),
-      ],
-    );
-  }
-
-  Widget OtherRow1() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: IconButtonText(
-            onClick: () {},
-            iconData: Icons.store,
-            text: "Search store",
-            selected: false,
-          ),
-        ),
-        Expanded(
-          child: IconButtonText(
-            onClick: () {},
-            iconData: Icons.store,
-            text: "Search store",
-            selected: false,
-          ),
         ),
       ],
     );

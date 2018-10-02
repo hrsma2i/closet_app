@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'typecategory.dart';
 
 class SelectTypeCategoryPage extends StatelessWidget {
   @override
@@ -12,50 +13,41 @@ class SelectTypeCategoryPage extends StatelessWidget {
         padding: const EdgeInsets.all(2.5),
         crossAxisCount: 4,
         crossAxisSpacing: 2.5,
-        children: [
-          TypeCategoryCard("T-shirts"),
-          TypeCategoryCard("polo"),
-          TypeCategoryCard("shirts"),
-          TypeCategoryCard("tops_open"),
-          TypeCategoryCard("tops_pullover"),
-          TypeCategoryCard("outer_short"),
-          TypeCategoryCard("outer_long"),
-          TypeCategoryCard("bottoms"),
-          TypeCategoryCard("shoes"),
-          TypeCategoryCard("other"),
-        ],
+        children: name2image.keys.map((typeCategory) =>
+            TypeCategoryCard(typeCategory)
+        ).toList(),
       ),
     );
   }
 }
 
 class TypeCategoryCard extends StatelessWidget {
-  String typecategory;
+  String typeCategory;
 
-  TypeCategoryCard(this.typecategory);
+  TypeCategoryCard(this.typeCategory);
 
   @override
   Widget build(BuildContext context) {
     return new GestureDetector(
-      child: Card(
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraint){
-                  return new Icon(
-                    Icons.airline_seat_recline_normal,
-                    size: constraint.biggest.height
-                  );
-                },
-              ),
+      child: GridTile(
+        footer: AspectRatio(
+          aspectRatio: 2.5,
+          child: GridTileBar(
+            backgroundColor: Colors.black54,
+            title: Container(
+              alignment: Alignment.center,
+              child: Text(
+                typeCategory.replaceAll('_', '\n'),
+                maxLines: 2,
+                textAlign: TextAlign.center,
+              )
             ),
-            Text(typecategory),
-          ],
+          ),
         ),
+        child: name2image[typeCategory],
       ),
       onTap: (){
-        Navigator.of(context).pop(typecategory);
+        Navigator.of(context).pop(typeCategory);
       },
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:closet_app/color.dart';
 
 class SelectColorPage extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -8,35 +10,53 @@ class SelectColorPage extends StatelessWidget {
         title: Text("select category"),
         automaticallyImplyLeading: false,
       ),
-      body: GridView.count(
-        padding: const EdgeInsets.all(2.5),
-        crossAxisCount: 5,
-        crossAxisSpacing: 2.5,
-        children: [
-          ColorCard(Colors.black),
-          ColorCard(Colors.white),
-          ColorCard(Color(0xFF6E6D51)),
-          ColorCard(Color(0xFFC6B399)),
-        ],
+      body: Container(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            colorColumn(["black", "grey", "white"]),
+            colorColumn(["brown", "camel", "beige"]),
+            colorColumn(["orange", "yellow"]),
+            colorColumn(["wine", "red", "pink"]),
+            colorColumn(["purple", "violet"]),
+            colorColumn(["navy", "blue", "sky_blue"]),
+            colorColumn(["olive", "green"]),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget colorColumn(List<String> colorNames) {
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: colorNames.map((name) => ColorCard(name)).toList(),
       ),
     );
   }
 }
 
 class ColorCard extends StatelessWidget {
-  Color color;
+  String colorName;
 
-  ColorCard(this.color);
+  ColorCard(this.colorName);
 
   @override
   Widget build(BuildContext context) {
-    return new GestureDetector(
-      child: Card(
-        color: color,
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: GestureDetector(
+        child: Card(
+          color: name2color[colorName],
+        ),
+        onTap: (){
+          Navigator.of(context).pop(colorName);
+        },
       ),
-      onTap: (){
-        Navigator.of(context).pop(color);
-      },
     );
   }
 }
