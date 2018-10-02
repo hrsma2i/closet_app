@@ -7,6 +7,8 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:closet_app/item.dart';
 import 'package:closet_app/database.dart';
 import 'package:closet_app/items_model.dart';
+import 'package:closet_app/select_typecategory_page.dart';
+import 'package:closet_app/select_color_page.dart';
 
 
 class ItemDetailsPage extends StatefulWidget {
@@ -46,9 +48,9 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
             children: <Widget>[
               ImageRow(),
               SizedBox(height: 16.0),
-              CategoryRow(),
+              CategoryRow(context),
               Divider(height: 10.0, color: Colors.black38),
-              ColorRow(),
+              ColorRow(context),
               Divider(height: 10.0, color: Colors.black38),
               OwnedRow(),
             ],
@@ -70,7 +72,7 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
     );
   }
 
-  Widget CategoryRow() {
+  Widget CategoryRow(BuildContext context) {
     return Row(
       children: <Widget>[
         Expanded(
@@ -84,24 +86,34 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
           ),
         ),
         FlatButton(
-            onPressed: () {
-              
-            },
-            child: Text(
-              widget.item.typeCategory,
-              style: const TextStyle(
-                fontSize: 20.0,
-                fontFamily: "CrimsonText",
-                fontWeight: FontWeight.w400,
-                color: Colors.blue,
-              ),
-            )
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                  SelectTypeCategoryPage()
+              )
+            ).then((typeCategory) {
+              setState(() {
+                widget.item.typeCategory = typeCategory;
+              });
+              ClosetDatabase.get().updateItem(widget.item);
+            });
+          },
+          child: Text(
+            widget.item.typeCategory.replaceAll('_', ' '),
+            style: const TextStyle(
+              fontSize: 20.0,
+              fontFamily: "CrimsonText",
+              fontWeight: FontWeight.w400,
+              color: Colors.blue,
+            ),
+          )
         )
       ],
     );
   }
 
-  Widget ColorRow() {
+  Widget ColorRow(BuildContext context) {
     return Row(
       children: <Widget>[
         Expanded(
@@ -114,17 +126,24 @@ class ItemDetailsPageState extends State<ItemDetailsPage> {
             ),
           ),
         ),
-        FlatButton(
-          onPressed: () {},
-          child: Text(
-            widget.item.color,
-            style: const TextStyle(
-              fontSize: 20.0,
-              fontFamily: "CrimsonText",
-              fontWeight: FontWeight.w400,
-              color: Colors.blue,
-            ),
-          )
+        Container(
+          height: 50.0,
+          child: ColorCard(
+            colorName: widget.item.color,
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                      SelectColorPage()
+                  )
+              ).then((colorName) {
+                setState(() {
+                  widget.item.color = colorName;
+                });
+                ClosetDatabase.get().updateItem(widget.item);
+              });
+            },
+          ),
         )
       ],
     );
