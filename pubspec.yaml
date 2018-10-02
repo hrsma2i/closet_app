@@ -138,6 +138,7 @@ flutter:
     - './icons/pants_fill.png'
     - './icons/pants_edge.png'
     - './icons/outfit_fill.png'
+    - './icons/colorful.png'
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

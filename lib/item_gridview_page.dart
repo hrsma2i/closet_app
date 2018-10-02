@@ -282,7 +282,7 @@ class _FancyFabState extends State<FancyFab>
           Navigator.of(context).push(
              MaterialPageRoute(
               builder: (context) =>
-               FilterPage(),
+               ItemFilterPage(),
               settings:  RouteSettings(
                   name: '/edit_filter',
                   isInitialRoute: false

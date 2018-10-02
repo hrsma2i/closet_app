@@ -14,7 +14,12 @@ class SelectTypeCategoryPage extends StatelessWidget {
         crossAxisCount: 4,
         crossAxisSpacing: 2.5,
         children: name2image.keys.map((typeCategory) =>
-            TypeCategoryCard(typeCategory)
+          TypeCategoryCard(
+            typeCategory: typeCategory,
+            onTap: () {
+              Navigator.of(context).pop(typeCategory);
+            },
+          )
         ).toList(),
       ),
     );
@@ -23,8 +28,9 @@ class SelectTypeCategoryPage extends StatelessWidget {
 
 class TypeCategoryCard extends StatelessWidget {
   String typeCategory;
+  Function onTap;
 
-  TypeCategoryCard(this.typeCategory);
+  TypeCategoryCard({this.typeCategory, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +52,7 @@ class TypeCategoryCard extends StatelessWidget {
         ),
         child: name2image[typeCategory],
       ),
-      onTap: (){
-        Navigator.of(context).pop(typeCategory);
-      },
+      onTap: onTap,
     );
   }
 }

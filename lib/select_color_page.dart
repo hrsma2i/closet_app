@@ -16,7 +16,7 @@ class SelectColorPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            colorColumn(["black", "grey", "white"]),
+            colorColumn(["black", "grey", "white", "all"]),
             colorColumn(["brown", "camel", "beige"]),
             colorColumn(["orange", "yellow"]),
             colorColumn(["wine", "red", "pink"]),
@@ -28,13 +28,27 @@ class SelectColorPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget colorColumn(List<String> colorNames) {
+class colorColumn extends StatelessWidget {
+  List<String> colorNames;
+
+  colorColumn(this.colorNames);
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
-        children: colorNames.map((name) => ColorCard(name)).toList(),
+        children: colorNames.map((name) =>
+          ColorCard(
+            colorName: name,
+            onTap: () {
+              Navigator.of(context).pop(name);
+            },
+          )
+        ).toList(),
       ),
     );
   }
@@ -42,20 +56,41 @@ class SelectColorPage extends StatelessWidget {
 
 class ColorCard extends StatelessWidget {
   String colorName;
+  Function onTap;
 
-  ColorCard(this.colorName);
+  ColorCard({this.colorName, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 1.0,
       child: GestureDetector(
-        child: Card(
-          color: name2color[colorName],
-        ),
-        onTap: (){
-          Navigator.of(context).pop(colorName);
-        },
+        child: colorName == "all"
+          ? allColor()
+          : Card(
+            color: name2color[colorName],
+          ),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Widget allColor() {
+    return Card(
+      child: Stack(
+        children: <Widget>[
+          Container(child: Image.asset('icons/colorful.png')),
+          Container(
+            alignment: Alignment.center,
+            child: Text(
+              'all',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

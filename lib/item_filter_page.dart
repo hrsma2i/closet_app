@@ -5,6 +5,7 @@ import 'package:closet_app/item.dart';
 import 'package:closet_app/select_color_page.dart';
 import 'package:closet_app/select_typecategory_page.dart';
 import 'package:closet_app/color.dart';
+import 'select_typecategory_page.dart';
 
 class Condition {
   String key;
@@ -54,76 +55,160 @@ class ConditionModel extends Model {
   }
 }
 
-class FilterPage extends StatefulWidget {
+class ItemFilterPage extends StatefulWidget {
   @override
-  FilterPageState createState() => FilterPageState();
+  ItemFilterPageState createState() => ItemFilterPageState();
 }
 
-class FilterPageState extends State<FilterPage> {
-  ConditionModel condition = ConditionModel(
-    null,
-    null,
-    null,
-  );
+class ItemFilterPageState extends State<ItemFilterPage> {
+  String _colorName;
+  String _typeCategory;
+  bool _owned;
 
   @override
   void initState() {
+    _colorName = 'all';
+    _typeCategory = 'all';
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModel<ConditionModel>(
-      model: condition,
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: Text('Filter'),
-        ),
-        body: Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              ColorConditionRow(),
-              Divider(),
-              TypeCategoryConditionRow(),
-              Divider(),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      "owned",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                          fontSize: 20.0
-                      ),
-                    )
-                  ),
-                  Checkbox(
-                    tristate: true,
-                    value: condition.owned,
-                    onChanged: (bool value) {
-                      setState(() {
-                        condition.owned = value;
-                      });
-                    }
-                  )
-                ],
-              ),
-              Divider(),
-            ]
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.check),
-          onPressed: (){
-            String sql = condition.getSql();
-            print(sql);
-            Navigator.pop(context, sql);
-          },
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text('Filter'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(10.0),
+        child: Column(
+          children: [
+            conditionRow('category', ValueTypeCategory()),
+            Divider(),
+            conditionRow('color', ValueColor()),
+            Divider(),
+            conditionRow('owned', ValueOwned()),
+          ]
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.check),
+        onPressed: (){
+          String sql = getSql();
+          print(sql);
+          Navigator.pop(context, sql);
+        },
+      ),
     );
+  }
+
+  Widget conditionRow(String key, Widget value) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Text(
+            key,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                fontSize: 20.0
+            ),
+          )
+        ),
+        value,
+      ],
+    );
+  }
+
+  Widget ValueTypeCategory() {
+    return Container(
+      height: 90.0,
+      width:  90.0,
+      child: TypeCategoryCard(
+        typeCategory: _typeCategory,
+        onTap: () {
+          Navigator.of(context)
+            .push(
+            MaterialPageRoute(
+              builder: (BuildContext context) =>
+                SelectTypeCategoryPage()
+            )
+          ).then((typeCategory) {
+            print(typeCategory);
+            setState(() {
+              _typeCategory = typeCategory;
+            });
+          });
+        },
+      ),
+    );
+  }
+
+  Widget ValueColor() {
+    return Container(
+      height: 90.0,
+      width:  90.0,
+      child: ColorCard(
+        colorName: _colorName,
+        onTap: () {
+          Navigator.of(context)
+              .push(
+              MaterialPageRoute(
+                builder: (BuildContext context) =>
+                  SelectColorPage()
+              )
+          ).then((colorName) {
+            print(colorName);
+            setState(() {
+              _colorName = colorName;
+            });
+          });
+        },
+      ),
+    );
+  }
+
+  Widget ValueOwned() {
+    return Checkbox(
+      tristate: true,
+      value: _owned,
+      onChanged: (bool value) {
+        setState(() {
+          _owned = value;
+        });
+      }
+    );
+  }
+
+  String getSql() {
+    String sql = """
+                 SELECT * FROM ${Item.tblItem}
+                 """;
+
+    List<String> sqlParts = new List();
+
+    if ((_colorName != 'all')
+        || (_typeCategory != 'all')
+        || (_owned != null)) {
+      sql += "WHERE ";
+    }
+    if (_colorName != 'all') {
+      sqlParts.add("""
+        ${Item.tblItem}.${Item.colColor} = "$_colorName"
+      """);
+    }
+    if (_typeCategory != 'all') {
+      sqlParts.add("""
+        ${Item.tblItem}.${Item.colTypeCategory} = "$_typeCategory"
+      """);
+    }
+    if (_owned != null) {
+      sqlParts.add("""
+        ${Item.tblItem}.${Item.colOwned} = ${_owned?1:0}
+      """);
+    }
+    sql += sqlParts.join("AND") + ";";
+
+    return sql;
   }
 }
 
