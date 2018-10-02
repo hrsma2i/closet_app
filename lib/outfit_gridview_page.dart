@@ -32,6 +32,12 @@ class OutfitGridState extends State<OutfitGrid> {
   }
 
   void updateOutfitsByQuery(String sql) {
+    //----prototype----
+    if (sql.contains("replacedTempMin")) {
+      sql = sql.replaceAll('replacedTempMin', '20');
+      sql = sql.replaceAll('replacedTempMax', '20');
+    }
+    //----prototype----
     ClosetDatabase.get()
       .getOutfits(sql)
       .then((outfits) {

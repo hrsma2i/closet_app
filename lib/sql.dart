@@ -108,7 +108,7 @@ Map<String, String> sqlMapOutfit = {
       )
       WHERE ${Outfit.colPossible} == 1
     )
-    WHERE ${Outfit.colTempMin} <= $tempMin
-      AND ${Outfit.colTempMax} >= $tempMax;
+    WHERE ${Outfit.colTempMin} <= replacedTempMin
+      AND ${Outfit.colTempMax} >= replacedTempMax;
     ''',
 };

@@ -20,6 +20,10 @@ class OutfitFilterPage extends StatefulWidget {
 class OutfitFilterPageState extends State<OutfitFilterPage> {
   ItemsRow rowIncluded = ItemsRow();
   ItemsRow rowExcluded = ItemsRow();
+  //----prototype----
+  TextEditingController minCtrler = TextEditingController();
+  TextEditingController maxCtrler = TextEditingController();
+  //----prototype----
 
   @override
   void initState() {
@@ -46,6 +50,36 @@ class OutfitFilterPageState extends State<OutfitFilterPage> {
             color: Colors.blue[400],
           ),
           rowExcluded,
+
+          //----prototype----
+          Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Container(
+                width: 150.0,
+                child: TextField(
+                  decoration: InputDecoration(
+                      labelText: "min temparature"
+                  ),
+                  keyboardType: TextInputType.number,
+                  controller: minCtrler,
+                ),
+              ),
+              Container(
+                width: 150.0,
+                child: TextField(
+                  decoration: InputDecoration(
+                    labelText: "max temparature"
+                  ),
+                  keyboardType: TextInputType.number,
+                    controller: maxCtrler,
+                ),
+              ),
+            ],
+          ),
+          //----prototype----
+
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -61,6 +95,8 @@ class OutfitFilterPageState extends State<OutfitFilterPage> {
   }
 
   String getSql(String originalQuery) {
+    print('getSql');
+
     String sqlIncluded = rowIncluded.items.map((item) =>
       "${Item.colItemId} == ${item.itemId}"
     ).toList().join('\n OR ');
@@ -75,8 +111,11 @@ class OutfitFilterPageState extends State<OutfitFilterPage> {
       FROM(
         ${originalQuery.replaceAll(";", "")}
       )
-      WHERE """;
+      """;
 
+    if (rowIncluded.items.isNotEmpty || rowExcluded.items.isNotEmpty) {
+      sql += "WHERE ";
+    }
     if (rowIncluded.items.isNotEmpty) {
       sql +="""
         ${Outfit.colOutfitId} IN (
@@ -106,7 +145,13 @@ class OutfitFilterPageState extends State<OutfitFilterPage> {
       sql += sqlExcluded;
       sql += ")";
     }
+
     sql += ";";
+
+    //----prototype----
+    sql = sql.replaceAll('replacedTempMin', minCtrler.text);
+    sql = sql.replaceAll('replacedTempMax', maxCtrler.text);
+    //----prototype----
 
     return sql;
   }
